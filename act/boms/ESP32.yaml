@@ -1,8 +1,6 @@
-
-  
 name: ICs Adafruit HUZZAH32- ESP32 Materials Model
 description: Materials model for ESP32-based Adafruit HUZZAH32 board,
-  based on Espressif ESP32 datasheet from https://documentation.espressif.com/esp32_datasheet_en.pdf
+  based on Espressif ESP32 datasheet from https://cdn-learn.adafruit.com/downloads/pdf/adafruit-huzzah32-esp32-feather.pdf
 silicon:
   # ESP32-based system with 2 ICs
   # 2 x ICs
