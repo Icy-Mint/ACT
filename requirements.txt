@@ -1,0 +1,5 @@
+# requirements.txt
+pint
+PyYAML
+
+# Python >= 3.12 recommended (ACT tested on 3.12.9)

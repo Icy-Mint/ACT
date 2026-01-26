@@ -1,0 +1,23 @@
+
+  
+name: ICs Adafruit HUZZAH32- ESP32 Materials Model
+description: Materials model for ESP32-based Adafruit HUZZAH32 board,
+  based on Espressif ESP32 datasheet from https://documentation.espressif.com/esp32_datasheet_en.pdf
+silicon:
+  # ESP32-based system with 2 ICs
+  # 2 x ICs
+  soc.AP2112:
+    area: 0.03037605 cm2
+    process: 28nm # replace 45nm with 28nm, so it can run using ACT's logic model with existing EPA lookup table 
+    n_ics: 1
+    fab_yield: 0.875
+    gpa: 95
+    fab_ci: coal
+
+  soc.ESP32_WROOM32:
+    area: 0.182 cm2
+    process: 28nm  # replace 45nm with 28nm, so it can run using ACT's logic model with existing EPA lookup table 
+    n_ics: 1
+    fab_yield: 0.875
+    gpa: 95
+    fab_ci: coal
