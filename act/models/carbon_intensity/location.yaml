@@ -1,4 +1,5 @@
-# carbon intensity of energy production by location
+# name: carbon intensity of energy production by location
+# carbon intensity of energy production by location copied from location_2023.yaml
 "world"     : 481 g / kWh
 "india"     : 713 g / kWh
 "australia" : 549 g / kWh
