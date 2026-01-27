@@ -35,10 +35,10 @@ def load_ci_model(
         loc_model = yaml.load(f, Loader=yaml.FullLoader)
         # check if the location model is a dictionary
         if not isinstance(loc_model, dict):
-        raise ValueError(
-            f"Location CI config must be a YAML mapping (dict), "
-            f"got {type(loc_model).__name__} from {loc_ci_config}"
-        )
+            raise ValueError(
+                f"Location CI config must be a YAML mapping (dict), "
+                f"got {type(loc_model).__name__} from {loc_ci_config}"
+            )
         # convert the location model to a dictionary of EnergyLocation objects and units
         loc_model = {EnergyLocation(k): units(v) for k, v in loc_model.items()}
         ci_model.update(loc_model)
@@ -47,10 +47,10 @@ def load_ci_model(
         src_model = yaml.load(f, Loader=yaml.FullLoader)
         # check if the source model is a dictionary
         if not isinstance(src_model, dict):
-        raise ValueError(
-            f"Source CI config must be a YAML mapping (dict), "
-            f"got {type(src_model).__name__} from {src_ci_config}"
-        )
+            raise ValueError(
+                f"Source CI config must be a YAML mapping (dict), "
+                f"got {type(src_model).__name__} from {src_ci_config}"
+            )
         # convert the source model to a dictionary of EnergySource objects and units
         src_model = {EnergySource(k): units(v) for k, v in src_model.items()}
         ci_model.update(src_model)
