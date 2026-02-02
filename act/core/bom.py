@@ -177,6 +177,7 @@ class BaseSpec:  # common materials specifications
     capacity: pint.Quantity = "0 kWh"
     fab_ci: str = None
     layers: int = None
+    thickness: pint.Quantity = None  # Added for PCB thickness
 
     def __post_init__(self):
         self.weight = units(self.weight)
