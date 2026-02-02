@@ -15,4 +15,7 @@ cpla : 0.13 kg / m2
 # typical thickness by layer (for adjustment when actual thickness is provided)
 typical_thickness:
   2: 1.6 mm  # https://docs.arduino.cc/resources/datasheets/ABX00031-datasheet.pdf
- 
+
+# carbon coefficient when thickness is provided: kg CO2e per mm² of PCB
+# formula: area (mm²) × layers × thickness (mm) × carbon_coefficient
+carbon_coefficient: 0.000006125 kg / mm2 # https://dl.acm.org/doi/pdf/10.1145/3643561
