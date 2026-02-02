@@ -6,6 +6,7 @@
 from dataclasses import dataclass
 
 from .capacitor_model import CapacitorType
+from .connector_model import ConnectorType
 from .units import *
 import os
 from enum import Enum
@@ -88,6 +89,8 @@ class BOM:
                     passives[cname] = ResistorSpec(**cdata)
                 elif cat is ComponentCategory.SIGNAL_BEAD:
                     passives[cname] = BaseSpec(**cdata)
+                elif cat is ComponentCategory.CONNECTOR:  
+                    passives[cname] = ConnectorSpec(**cdata)
                 else:
                     raise NotImplementedError(
                         f"Materials specification category {cat} for materials list item {cname} not defined."
@@ -205,6 +208,13 @@ class CapacitorSpec(BaseSpec):
 class ResistorSpec(BaseSpec):
     type: str = ""
 
+@dataclass
+class ConnectorSpec(BaseSpec):
+    type: str = ConnectorType.PERIPHERAL.value
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.type = ConnectorType(self.type)
 
 @dataclass
 class MaterialSpec(BaseSpec):

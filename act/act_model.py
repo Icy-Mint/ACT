@@ -30,6 +30,7 @@ from .core.ssd_model import SSDModel
 from .core.bom import *
 from .core.battery_model import BatteryModel
 from .core.pcb_model import DEFAULT_PCB_MODEL_FILE, PCBModel
+from .core.connector_model import ConnectorModel, DEFAULT_CONNECTOR_MODEL_FILE
 from .core.utils import DEFAULT_LOCATION_CONFIG, DEFAULT_SOURCE_CONFIG
 
 
@@ -43,6 +44,7 @@ class ACTModel:
         hdd_config=DEFAULT_HDD_CONFIG,
         materials_config=DEFAULT_MATERIALS_CONFIG,
         pcb_config=DEFAULT_PCB_MODEL_FILE,
+        connector_config=DEFAULT_CONNECTOR_MODEL_FILE,
         loc_ci_config=DEFAULT_LOCATION_CONFIG,
         src_ci_config=DEFAULT_SOURCE_CONFIG,
     ):
@@ -55,6 +57,7 @@ class ACTModel:
             dram_config: DRAM model configuration file
             hdd_config: HDD model configuration file
             pcb_config: PCB model configuration file
+            connector_config: Connector model configuration file
             materials_config: Material model configuration file
             loc_ci_config: Location carbon intensity configuration file
             src_ci_config: Energy source carbon intensity configuration file
@@ -82,6 +85,7 @@ class ACTModel:
         self.cap_model = CapacitorModel(model_file=cap_config)
         self.materials_model = MaterialsModel(model_file=materials_config)
         self.pcb_model = PCBModel(model_file=pcb_config)
+        self.connector_model = ConnectorModel(model_file=connector_config) 
         self.battery_model = BatteryModel()
 
         # save the last settings
@@ -216,6 +220,12 @@ class ACTModel:
                     ctype=pspec.type,
                     weight=pspec.weight,
                     n_caps=pspec.quantity,
+                )
+            elif pspec.category is ComponentCategory.CONNECTOR:  
+                carbon = self.connector_model.get_carbon(
+                    weight=pspec.weight,
+                    connector_type=pspec.type,
+                    n_connectors=pspec.quantity,
                 )
             else:
                 raise NotImplementedError(

@@ -27,6 +27,8 @@ materials:
     area: 11.07 cm2
     layers: 2
     thickness: 1.6 mm
+
+passives:
 # 5 x Capacitors
 #   capacitor.C1:
 #     category: capacitor
@@ -49,18 +51,22 @@ materials:
 
 #   resistor.R4:  
 #     category: resistor
+
 # 3 x Connectors
   connector.JP1:
     category: connector
     weight: 0.003855989 kg
-    connector_type: peripheral
+    type: peripheral
+    quantity: 1
 
   connector.JP2:
     category: connector
     weight: 0.000971992 kg
-    connector_type: peripheral
+    type: peripheral
+    quantity: 1
 
   connector.JP5:
     category: connector
     weight: 0.000971992 kg
-    connector_type: peripheral
+    type: peripheral
+    quantity: 1 

@@ -196,6 +196,7 @@ class ComponentCategory(Enum):
     PCB = "pcb"
     BATTERY = "battery"
     SIGNAL_BEAD = "signal bead"
+    CONNECTOR = "connector"
     OTHER = "other"
 
 
