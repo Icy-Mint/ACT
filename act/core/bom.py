@@ -184,6 +184,7 @@ class BaseSpec:  # common materials specifications
         self.category = ComponentCategory(self.category)
         self.area = units(self.area)
         self.capacity = units(self.capacity)
+        self.thickness = units(self.thickness) if self.thickness is not None else None
         self.fab_ci = (
             get_src_or_loc(self.fab_ci)
             if self.fab_ci is not None

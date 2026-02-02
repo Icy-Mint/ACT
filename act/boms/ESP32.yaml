@@ -26,34 +26,35 @@ materials:
     category: pcb
     area: 11.07 cm2
     layers: 2
+    thickness: 1.6 mm
 # 5 x Capacitors
-  capacitor.C1:
-    category: capacitor
+#   capacitor.C1:
+#     category: capacitor
   
-  capacitor.C2:
-    category: capacitor
+#   capacitor.C2:
+#     category: capacitor
 
-  capacitor.C3:
-    category: capacitor
+#   capacitor.C3:
+#     category: capacitor
 
-  capacitor.C4:
-    category: capacitor
+#   capacitor.C4:
+#     category: capacitor
   
-  capacitor.C5:
-    category: capacitor
+#   capacitor.C5:
+#     category: capacitor
 
-# 2 x Resistors
-  resistor.R2:  
-    category: resistor
+# # 2 x Resistors
+#   resistor.R2:  
+#     category: resistor
 
-  resistor.R4:  
-    category: resistor
-# 3 x Connectors
-  connector.JP1:
-    category: connector
+#   resistor.R4:  
+#     category: resistor
+# # 3 x Connectors
+#   connector.JP1:
+#     category: connector
   
-  connector.JP2:
-    category: connector
+#   connector.JP2:
+#     category: connector
   
-  connector.JP5:
-    category: connector
+#   connector.JP5:
+#     category: connector

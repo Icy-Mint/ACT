@@ -18,4 +18,4 @@ typical_thickness:
 
 # carbon coefficient when thickness is provided: kg CO2e per mm² of PCB
 # formula: area (mm²) × layers × thickness (mm) × carbon_coefficient
-carbon_coefficient: 0.000006125 kg / mm2 # https://dl.acm.org/doi/pdf/10.1145/3643561
+carbon_coefficient: 0.000006125 kg / mm^3 # https://dl.acm.org/doi/pdf/10.1145/3643561

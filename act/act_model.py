@@ -234,7 +234,11 @@ class ACTModel:
                     mat=spec.type, weight=spec.weight
                 )
             elif spec.category is ComponentCategory.PCB:
-                carbon = self.pcb_model.get_carbon(area=spec.area, layers=spec.layers)
+                carbon = self.pcb_model.get_carbon(
+                    area=spec.area, 
+                    layers=spec.layers,
+                    thickness=spec.thickness     # added for PCB thickness
+                )
             elif spec.category is ComponentCategory.BATTERY:
                 carbon = self.battery_model.get_carbon(capacity=spec.capacity)
             else:
