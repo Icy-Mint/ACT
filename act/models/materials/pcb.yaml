@@ -11,3 +11,8 @@
 # also provide the weighted average carbon per area per layer of the GHG-CO2-eq to interpolate the higher layers
 # assumes zero intercept linear model for now in lieu of a better model and more data
 cpla : 0.13 kg / m2
+
+# typical thickness by layer (for adjustment when actual thickness is provided)
+typical_thickness:
+  2: 1.6 mm  # https://docs.arduino.cc/resources/datasheets/ABX00031-datasheet.pdf
+ 
