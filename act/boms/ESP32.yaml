@@ -49,12 +49,18 @@ materials:
 
 #   resistor.R4:  
 #     category: resistor
-# # 3 x Connectors
-#   connector.JP1:
-#     category: connector
-  
-#   connector.JP2:
-#     category: connector
-  
-#   connector.JP5:
-#     category: connector
+# 3 x Connectors
+  connector.JP1:
+    category: connector
+    weight: 0.003855989 kg
+    connector_type: peripheral
+
+  connector.JP2:
+    category: connector
+    weight: 0.000971992 kg
+    connector_type: peripheral
+
+  connector.JP5:
+    category: connector
+    weight: 0.000971992 kg
+    connector_type: peripheral
