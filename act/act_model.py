@@ -31,6 +31,9 @@ from .core.bom import *
 from .core.battery_model import BatteryModel
 from .core.pcb_model import DEFAULT_PCB_MODEL_FILE, PCBModel
 from .core.connector_model import ConnectorModel, DEFAULT_CONNECTOR_MODEL_FILE
+from .core.diode_model import DiodeModel, DEFAULT_DIODE_MODEL_FILE
+from .core.switch_model import SwitchModel, DEFAULT_SWITCH_MODEL_FILE
+from .core.resistor_model import ResistorModel, DEFAULT_RESISTOR_MODEL_FILE
 from .core.utils import DEFAULT_LOCATION_CONFIG, DEFAULT_SOURCE_CONFIG
 
 
@@ -45,6 +48,9 @@ class ACTModel:
         materials_config=DEFAULT_MATERIALS_CONFIG,
         pcb_config=DEFAULT_PCB_MODEL_FILE,
         connector_config=DEFAULT_CONNECTOR_MODEL_FILE,
+        diode_config=DEFAULT_DIODE_MODEL_FILE,
+        resistor_config=DEFAULT_RESISTOR_MODEL_FILE,
+        switch_config=DEFAULT_SWITCH_MODEL_FILE,
         loc_ci_config=DEFAULT_LOCATION_CONFIG,
         src_ci_config=DEFAULT_SOURCE_CONFIG,
     ):
@@ -58,6 +64,9 @@ class ACTModel:
             hdd_config: HDD model configuration file
             pcb_config: PCB model configuration file
             connector_config: Connector model configuration file
+            diode_config: Diode model configuration file
+            switch_config: Switch model configuration file
+            resistor_config: Resistor model configuration file
             materials_config: Material model configuration file
             loc_ci_config: Location carbon intensity configuration file
             src_ci_config: Energy source carbon intensity configuration file
@@ -86,6 +95,9 @@ class ACTModel:
         self.materials_model = MaterialsModel(model_file=materials_config)
         self.pcb_model = PCBModel(model_file=pcb_config)
         self.connector_model = ConnectorModel(model_file=connector_config) 
+        self.diode_model = DiodeModel(model_file=diode_config)
+        self.resistor_model = ResistorModel(model_file=resistor_config)
+        self.switch_model = SwitchModel(model_file=switch_config)
         self.battery_model = BatteryModel()
 
         # save the last settings
@@ -226,6 +238,23 @@ class ACTModel:
                     weight=pspec.weight,
                     connector_type=pspec.type,
                     n_connectors=pspec.quantity,
+                )
+            elif pspec.category is ComponentCategory.DIODE:
+                carbon = self.diode_model.get_carbon(
+                    weight=pspec.weight,
+                    diode_type=pspec.type,
+                    n_diodes=pspec.quantity,
+                )
+            elif pspec.category is ComponentCategory.SWITCH:
+                carbon = self.switch_model.get_carbon(
+                    weight=pspec.weight,
+                    switch_type=pspec.type,
+                    n_switches=pspec.quantity,
+                )
+            elif pspec.category is ComponentCategory.RESISTOR:
+                carbon = self.resistor_model.get_carbon(
+                    n_resistors=pspec.quantity,
+                    resistor_type=pspec.type,
                 )
             else:
                 raise NotImplementedError(

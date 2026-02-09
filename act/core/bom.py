@@ -7,6 +7,10 @@ from dataclasses import dataclass
 
 from .capacitor_model import CapacitorType
 from .connector_model import ConnectorType
+from .diode_model import DiodeType
+from .resistor_model import ResistorType
+from .switch_model import SwitchType
+
 from .units import *
 import os
 from enum import Enum
@@ -91,6 +95,10 @@ class BOM:
                     passives[cname] = BaseSpec(**cdata)
                 elif cat is ComponentCategory.CONNECTOR:  
                     passives[cname] = ConnectorSpec(**cdata)
+                elif cat is ComponentCategory.DIODE:
+                    passives[cname] = DiodeSpec(**cdata)
+                elif cat is ComponentCategory.SWITCH:
+                    passives[cname] = SwitchSpec(**cdata)
                 else:
                     raise NotImplementedError(
                         f"Materials specification category {cat} for materials list item {cname} not defined."
@@ -203,10 +211,21 @@ class CapacitorSpec(BaseSpec):
         super().__post_init__()
         self.type = CapacitorType(self.type)
 
+@dataclass
+class SwitchSpec(BaseSpec):
+    type: str = SwitchType.GENERIC.value
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.type = SwitchType(self.type)
 
 @dataclass
 class ResistorSpec(BaseSpec):
-    type: str = ""
+    type: str = ResistorType.PKG_0805.value
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.type = ResistorType(self.type)
 
 @dataclass
 class ConnectorSpec(BaseSpec):
@@ -215,6 +234,14 @@ class ConnectorSpec(BaseSpec):
     def __post_init__(self):
         super().__post_init__()
         self.type = ConnectorType(self.type)
+
+@dataclass
+class DiodeSpec(BaseSpec):
+    type: str = DiodeType.GENERIC.value
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.type = DiodeType(self.type)
 
 @dataclass
 class MaterialSpec(BaseSpec):

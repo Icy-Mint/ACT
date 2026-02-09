@@ -55,21 +55,47 @@ passives:
     type: "0805"
     quantity: 1
 
-  capacitor.R2:
-    category: capacitor
+# # 2 x Resistors
+  resistor.R2:
+    category: resistor
     type: "0603"
     quantity: 1
 
-  capacitor.R4:
-      category: capacitor
+  resistor.R4:
+      category: resistor
       type: "0603"
       quantity: 1
-# # 2 x Resistors
-#   resistor.R2:  
-#     category: resistor
 
-#   resistor.R4:  
-#     category: resistor
+# 2 x Diodes
+  diode.D1:
+    category: diode
+    type: "glass_smd"
+    weight: 1.00074E-05 kg
+    quantity: 1
+    
+  diode.D2:
+    category: diode
+    type: "glass_smd"
+    weight: 1.00074E-05 kg
+    quantity: 1
+  
+  diode.D3:
+    category: diode
+    type: "led"
+    weight: 1.81437E-06 kg
+    quantity: 1
+  
+  diode.D5:
+    category: diode
+    type: "glass_smd"
+    weight: 1.02909E-05 kg
+    quantity: 1
+
+  diode.D6:
+    category: diode
+    type: "glass_smd"
+    weight: 1.02909E-05 kg
+    quantity: 1
 
 # 3 x Connectors
   connector.JP1:
@@ -89,3 +115,16 @@ passives:
     weight: 0.000971992 kg
     type: peripheral
     quantity: 1 
+  
+# 2 x Switches
+  switch.SW1:
+    category: switch
+    type: generic
+    weight: 5.256E-05 kg
+    quantity: 1
+
+  switch.SW2:
+    category: switch
+    type: generic
+    weight: 5.256E-05 kg
+    quantity: 1  

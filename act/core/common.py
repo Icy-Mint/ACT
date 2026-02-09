@@ -197,8 +197,8 @@ class ComponentCategory(Enum):
     BATTERY = "battery"
     SIGNAL_BEAD = "signal bead"
     CONNECTOR = "connector"
+    SWITCH = "switch"
     OTHER = "other"
-
 
 class ModelType(Enum):
     """
