@@ -8,7 +8,7 @@ from .logger import log
 from .units import kg, units
 from enum import Enum
 
-DEFAULT_CONNECTOR_MODEL_FILE = f"{ACT_ROOT}/models/materials/connector.yaml"
+DEFAULT_CONNECTOR_MODEL_FILE = f"{ACT_ROOT}/models/passives/connector.yaml"
 
 
 class ConnectorType(Enum):
