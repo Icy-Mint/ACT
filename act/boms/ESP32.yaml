@@ -30,21 +30,40 @@ materials:
 
 passives:
 # 5 x Capacitors
-#   capacitor.C1:
-#     category: capacitor
+  capacitor.C1:
+    category: capacitor
+    type: "0805"
+    quantity: 1
   
-#   capacitor.C2:
-#     category: capacitor
-
-#   capacitor.C3:
-#     category: capacitor
-
-#   capacitor.C4:
-#     category: capacitor
+  capacitor.C2:
+    category: capacitor
+    type: "0805"
+    quantity: 1
+    
+  capacitor.C3:
+    category: capacitor
+    type: "0805"
+    quantity: 1
+    
+  capacitor.C4:
+    category: capacitor
+    type: "0805"
+    quantity: 1
   
-#   capacitor.C5:
-#     category: capacitor
+  capacitor.C5:
+    category: capacitor
+    type: "0805"
+    quantity: 1
 
+  capacitor.R2:
+    category: capacitor
+    type: "0603"
+    quantity: 1
+
+  capacitor.R4:
+      category: capacitor
+      type: "0603"
+      quantity: 1
 # # 2 x Resistors
 #   resistor.R2:  
 #     category: resistor
