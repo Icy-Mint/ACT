@@ -159,7 +159,12 @@ class ACTModel:
 
         # export the result to report for auditing
         if export_file is None:
-            export_file = f"{self.out_dir}/act_report.yaml"
+            # Use the input BOM filename if available
+            if hasattr(bom, 'file') and bom.file:
+                input_filename = os.path.splitext(os.path.basename(bom.file))[0]
+                export_file = f"{self.out_dir}/act_report_{input_filename}.yaml"
+            else:
+                export_file = f"{self.out_dir}/act_report.yaml"
         self.export_results(export_file, total_carbon)
 
         return total_carbon
