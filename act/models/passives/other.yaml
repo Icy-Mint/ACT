@@ -1,7 +1,17 @@
-# Passive components carbon emission factors
+# Passive and Active components carbon emission factors
 # Units: kg CO2e per kg of material
 
 # General components
 # Dataset: market for electronic component, passive, unspecified
 # Source: https://ecoquery.ecoinvent.org/3.11/cutoff/dataset/1666/documentation
 generic: 63.5 kg / kg  
+
+# Active component (unspecified)
+# Dataset: market for electronic component, active, unspecified
+# Source: https://ecoquery.ecoinvent.org/3.11/cutoff/dataset/4729/documentation
+active_generic: 121 kg / kg
+
+# Passive component (unspecified)
+# Dataset: market for electronic component, passive, unspecified
+# Source: https://ecoquery.ecoinvent.org/3.11/cutoff/dataset/1666/documentation
+passive_generic: 63.5 kg / kg

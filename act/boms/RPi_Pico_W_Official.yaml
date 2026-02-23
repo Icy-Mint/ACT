@@ -118,6 +118,19 @@ passives:
     weight: 1.50252E-06 kg
     quantity: 1
 
+# # 2 x Ferite Bead 
+  other.FB8:
+    category: other  # Ferite Bead 
+    type: generic
+    weight: 2.01282E-06 kg 
+    quantity: 1
+
+  other.FB9:
+      category: other  # Ferite Bead 
+      type: generic
+      weight: 3.50117E-05 kg 
+      quantity: 1
+
 # # 2 x Resistors
   resistor.R2:
     category: resistor
