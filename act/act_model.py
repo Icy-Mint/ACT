@@ -34,6 +34,7 @@ from .core.connector_model import ConnectorModel, DEFAULT_CONNECTOR_MODEL_FILE
 from .core.diode_model import DiodeModel, DEFAULT_DIODE_MODEL_FILE
 from .core.switch_model import SwitchModel, DEFAULT_SWITCH_MODEL_FILE
 from .core.resistor_model import ResistorModel, DEFAULT_RESISTOR_MODEL_FILE
+from .core.other_model import OtherModel, DEFAULT_OTHER_MODEL_FILE
 from .core.utils import DEFAULT_LOCATION_CONFIG, DEFAULT_SOURCE_CONFIG
 
 
@@ -51,6 +52,7 @@ class ACTModel:
         diode_config=DEFAULT_DIODE_MODEL_FILE,
         resistor_config=DEFAULT_RESISTOR_MODEL_FILE,
         switch_config=DEFAULT_SWITCH_MODEL_FILE,
+        other_config=DEFAULT_OTHER_MODEL_FILE,
         loc_ci_config=DEFAULT_LOCATION_CONFIG,
         src_ci_config=DEFAULT_SOURCE_CONFIG,
     ):
@@ -67,6 +69,7 @@ class ACTModel:
             diode_config: Diode model configuration file
             switch_config: Switch model configuration file
             resistor_config: Resistor model configuration file
+            other_config: Other model configuration file
             materials_config: Material model configuration file
             loc_ci_config: Location carbon intensity configuration file
             src_ci_config: Energy source carbon intensity configuration file
@@ -98,6 +101,7 @@ class ACTModel:
         self.diode_model = DiodeModel(model_file=diode_config)
         self.resistor_model = ResistorModel(model_file=resistor_config)
         self.switch_model = SwitchModel(model_file=switch_config)
+        self.other_model = OtherModel(model_file=other_config)
         self.battery_model = BatteryModel()
 
         # save the last settings
@@ -260,6 +264,12 @@ class ACTModel:
                 carbon = self.resistor_model.get_carbon(
                     n_resistors=pspec.quantity,
                     resistor_type=pspec.type,
+                )
+            elif pspec.category is ComponentCategory.OTHER:
+                carbon = self.other_model.get_carbon(
+                    weight=pspec.weight,
+                    component_type=pspec.type,
+                    n_components=pspec.quantity,
                 )
             else:
                 raise NotImplementedError(

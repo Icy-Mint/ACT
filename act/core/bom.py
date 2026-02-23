@@ -10,6 +10,7 @@ from .connector_model import ConnectorType
 from .diode_model import DiodeType
 from .resistor_model import ResistorType
 from .switch_model import SwitchType
+from .other_model import OtherType
 
 from .units import *
 import os
@@ -99,6 +100,8 @@ class BOM:
                     passives[cname] = DiodeSpec(**cdata)
                 elif cat is ComponentCategory.SWITCH:
                     passives[cname] = SwitchSpec(**cdata)
+                elif cat is ComponentCategory.OTHER:
+                    passives[cname] = OtherType(**cdata)
                 else:
                     raise NotImplementedError(
                         f"Materials specification category {cat} for materials list item {cname} not defined."
@@ -254,7 +257,13 @@ class MaterialSpec(BaseSpec):
             self.material_type(self.type) if self.type else self.material_type.NA
         )
 
+@dataclass
+class OtherSpec(BaseSpec):
+    type: str = OtherType.GENERIC.value
 
+    def __post_init__(self):
+        super().__post_init__()
+        self.type = OtherType(self.type)
 def load_bom(materials_file: str, material_type: Enum):
     """Load the materials file and return a BOM data structure"""
 
