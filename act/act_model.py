@@ -292,7 +292,7 @@ class ACTModel:
     def materials_analysis(self, materials):
         materials_results = dict()
         for pname, spec in materials.items():
-            if spec.category in [ComponentCategory.FRAME, ComponentCategory.ENCLOSURE]:
+            if spec.category in [ComponentCategory.FRAME, ComponentCategory.ENCLOSURE,  ComponentCategory.TIN]:
                 carbon = self.materials_model.get_carbon(
                     mat=spec.type, weight=spec.weight
                 )

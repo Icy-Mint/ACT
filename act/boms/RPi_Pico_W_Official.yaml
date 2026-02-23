@@ -44,6 +44,10 @@ materials:
     area: 10.71 cm2
     layers: 2
     thickness: 1 mm
+  
+  SH1:
+    category: tin
+    weight: 0.00149124 kg
 
 passives:
 # 5 x Capacitors
@@ -105,7 +109,7 @@ passives:
     category: capacitor
     type: "0402"
     quantity: 1  
-# 2 x Diodes
+# 3 x Diodes
   diode.D1:
     category: diode
     type: "glass_smd"
@@ -116,6 +120,12 @@ passives:
     category: diode
     type: "glass_smd"
     weight: 1.50252E-06 kg
+    quantity: 1
+  
+  diode.Q1:
+    category: diode
+    type:"transistor"
+    weight: 2.01282E-06 kg
     quantity: 1
 
 # 2 x Ferite Bead 
@@ -130,22 +140,78 @@ passives:
       type: generic
       weight: 3.50117E-05 kg 
       quantity: 1
+
 # Active components 
   active.FL1:
     category: active
     type: active_generic
     weight: 7.99457E-06 kg
     quantity: 1
-# # 2 x Resistors
-  resistor.R2:
+# 13 x Resistors
+  resistor.R1:  # R1,R6,R10,R88
     category: resistor
     type: "0603"
-    quantity: 1
+    quantity: 4
 
-  resistor.R4:
+  resistor.R2:  # R2,R8,R20
+      category: resistor
+      type: "0603"
+      quantity: 3
+  
+  resistor.R3:  
+      category: resistor
+      type: "0603"
+      quantity: 1 
+
+  resistor.R5:  
+      category: resistor
+      type: "0603"
+      quantity: 1   
+
+  resistor.R7:  
+      category: resistor
+      type: "0603"
+      quantity: 1 
+
+  resistor.R9:  
+      category: resistor
+      type: "0402"
+      quantity: 1 
+
+  resistor.R11:  # R11, R14  
+      category: resistor
+      type: "0603"
+      quantity: 2 
+
+  resistor.R12:  # R12, R13
+      category: resistor
+      type: "0603"
+      quantity: 2
+
+  resistor.R21:  
       category: resistor
       type: "0603"
       quantity: 1
+
+  resistor.R80:  
+      category: resistor
+      type: "0603"
+      quantity: 1 
+
+  resistor.R81:  
+      category: resistor
+      type: "0603"
+      quantity: 1 
+
+  resistor.R86:  
+      category: resistor
+      type: "0603"
+      quantity: 1 
+
+  resistor.R87:  
+      category: resistor
+      type: "0603"
+      quantity: 1 
 
 # 3 x Connectors
   connector.J0:
@@ -182,7 +248,9 @@ passives:
     category: connector
     type: "0603"
     quantity: 1
-  
+
+
+
 # 2 x Switches
   switch.SW1:
     category: switch

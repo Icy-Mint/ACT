@@ -199,6 +199,7 @@ class ComponentCategory(Enum):
     CONNECTOR = "connector"
     SWITCH = "switch"
     ACTIVE = "active"
+    TIN = "tin" 
     OTHER = "other"
 
 class ModelType(Enum):
