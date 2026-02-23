@@ -94,4 +94,4 @@ class ConnectorModel:
             f"Connector carbon calculation: {weight} * {emission_factor} * {n_connectors} = {total_carbon}"
         )
         
-        return Carbon(total_carbon, SourceType.FABRICATION)
+        return Carbon(total_carbon, SourceType.CONNECTOR)

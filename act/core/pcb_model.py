@@ -78,7 +78,7 @@ class PCBModel:
             log.debug(
                 f"Using thickness-based PCB calculation: {area} * {layers} layers * {thickness} * {self.carbon_coefficient}"
             )
-            return Carbon(c, SourceType.FABRICATION)
+            return Carbon(c, SourceType.PCB)
         
         # Otherwise, use the layer-based area calculation (original method)
         if layers in self.model:
@@ -93,4 +93,4 @@ class PCBModel:
 
         c = cpa * area
         log.debug(f"Using layer-based PCB calculation: {layers} layers * {area}")
-        return Carbon(c, SourceType.FABRICATION)
+        return Carbon(c, SourceType.PCB)

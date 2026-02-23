@@ -23,6 +23,10 @@ class SourceType(Enum):
     PASSIVES = auto()  # Cost of passives like capacitors, resistors, and diodes
     PCB = auto()  # PCB manufacturing cost
     CONNECTOR = auto()  # Connector passives cost
+    DIODE = auto()  # Manufacturing cost of Diode/LED/transistor components
+    RESISTOR = auto()  # Manufacturing cost of Resistor components
+    CAPACITOR = auto()  # Manufacturing cost of Capacitor components
+    SWITCH = auto()  # Manufacturing cost of Switch components
     ENCLOSURE = auto()  # Enclosure cost like case, plastic frames, etc.
     OTHER = auto()  # Miscellaneous source type
 

@@ -93,4 +93,4 @@ class DiodeModel:
             f"Diode carbon calculation: {weight} * {emission_factor} * {n_diodes} = {total_carbon}"
         )
         
-        return Carbon(total_carbon, SourceType.FABRICATION)
+        return Carbon(total_carbon, SourceType.DIODE)

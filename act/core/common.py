@@ -150,7 +150,6 @@ class EnergySource(Enum):
     NUCLEAR = "nuclear"
     WIND = "wind"
 
-
 """
 Default fabrication source.
 """

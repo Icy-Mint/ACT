@@ -84,7 +84,7 @@ class SwitchModel:
         total_carbon = weight * emission_factor * n_switches
         
         log.debug(
-            f"Switch carbon calculation: {weight} × {emission_factor} × {n_switches} = {total_carbon}"
+            f"Switch carbon calculation: {weight} * {emission_factor} * {n_switches} = {total_carbon}"
         )
         
-        return Carbon(total_carbon, SourceType.FABRICATION)
+        return Carbon(total_carbon, SourceType.SWITCH)

@@ -125,15 +125,15 @@ class CapacitorModel:
         if ctype in self.package_model:
             emission_per_cap = self.package_model[ctype]
             total_carbon = emission_per_cap * n_caps
-            return Carbon(total_carbon, SourceType.PASSIVES)
+            return Carbon(total_carbon, SourceType.CAPACITOR)
         
         # Method 2: Energy-based calculation (legacy)
         elif ctype in self.capacitor_model:
             energy_per_kg = self.capacitor_model[ctype]
             carbon_intensity = self.ci_model[ci]
             total_carbon = energy_per_kg * weight * n_caps * carbon_intensity
-            return Carbon(total_carbon, SourceType.PASSIVES)
+            return Carbon(total_carbon, SourceType.CAPACITOR)
         
         # Fallback: Use default
         else:
-            return Carbon(DEFAULT_CARBON_PER_CAPACITOR * n_caps, SourceType.PASSIVES)
+            return Carbon(DEFAULT_CARBON_PER_CAPACITOR * n_caps, SourceType.CAPACITOR)

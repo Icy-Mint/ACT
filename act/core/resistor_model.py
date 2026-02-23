@@ -87,4 +87,4 @@ class ResistorModel:
             f"Resistor carbon (package-based): {emission_factor} * {n_resistors} = {total_carbon}"
         )
         
-        return Carbon(total_carbon, SourceType.FABRICATION)
+        return Carbon(total_carbon, SourceType.RESISTOR)
