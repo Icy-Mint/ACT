@@ -10,6 +10,7 @@ from .connector_model import ConnectorType
 from .diode_model import DiodeType
 from .resistor_model import ResistorType
 from .switch_model import SwitchType
+from .inductor_model import InductorType
 from .other_model import OtherType
 
 from .units import *
@@ -102,6 +103,8 @@ class BOM:
                     passives[cname] = SwitchSpec(**cdata)
                 elif cat is ComponentCategory.ACTIVE:
                     passives[cname] = OtherSpec(**cdata) # Active components are treated as other components
+                elif cat is ComponentCategory.INDUCTOR:
+                    passives[cname] = InductorType(**cdata)
                 elif cat is ComponentCategory.OTHER:
                     passives[cname] = OtherType(**cdata)
                 else:
@@ -258,7 +261,14 @@ class MaterialSpec(BaseSpec):
         self.type = (
             self.material_type(self.type) if self.type else self.material_type.NA
         )
+@dataclass
+class InductorSpec(BaseSpec):
+    type: str = InductorType.PKG_0805.value
 
+    def __post_init__(self):
+        super().__post_init__()
+        self.type = InductorType(self.type)
+        
 @dataclass
 class OtherSpec(BaseSpec):
     type: str = OtherType.GENERIC.value

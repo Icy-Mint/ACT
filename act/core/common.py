@@ -189,6 +189,7 @@ class ComponentCategory(Enum):
     CAPACITOR = "capacitor"
     RESISTOR = "resistor"
     DIODE = "diode"
+    INDUCTOR = "inductor"
     FRAME = "frame"
     ENCLOSURE = "enclosure"
     SILICON = "silicon"

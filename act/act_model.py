@@ -34,6 +34,7 @@ from .core.connector_model import ConnectorModel, DEFAULT_CONNECTOR_MODEL_FILE
 from .core.diode_model import DiodeModel, DEFAULT_DIODE_MODEL_FILE
 from .core.switch_model import SwitchModel, DEFAULT_SWITCH_MODEL_FILE
 from .core.resistor_model import ResistorModel, DEFAULT_RESISTOR_MODEL_FILE
+from .core.inductor_model import InductorModel, DEFAULT_INDUCTOR_MODEL_FILE
 from .core.other_model import OtherModel, DEFAULT_OTHER_MODEL_FILE
 from .core.utils import DEFAULT_LOCATION_CONFIG, DEFAULT_SOURCE_CONFIG
 
@@ -52,6 +53,7 @@ class ACTModel:
         diode_config=DEFAULT_DIODE_MODEL_FILE,
         resistor_config=DEFAULT_RESISTOR_MODEL_FILE,
         switch_config=DEFAULT_SWITCH_MODEL_FILE,
+        inductor_config=DEFAULT_INDUCTOR_MODEL_FILE,
         other_config=DEFAULT_OTHER_MODEL_FILE,
         loc_ci_config=DEFAULT_LOCATION_CONFIG,
         src_ci_config=DEFAULT_SOURCE_CONFIG,
@@ -101,6 +103,7 @@ class ACTModel:
         self.diode_model = DiodeModel(model_file=diode_config)
         self.resistor_model = ResistorModel(model_file=resistor_config)
         self.switch_model = SwitchModel(model_file=switch_config)
+        self.inductor_model = InductorModel(model_file=inductor_config)
         self.other_model = OtherModel(model_file=other_config)
         self.battery_model = BatteryModel()
 
@@ -259,6 +262,12 @@ class ACTModel:
                     weight=pspec.weight,
                     switch_type=pspec.type,
                     n_switches=pspec.quantity,
+                )
+            elif pspec.category is ComponentCategory.INDUCTOR:
+                carbon = self.inductor_model.get_carbon(
+                    n_inductors=pspec.quantity,
+                    inductor_type=pspec.type,
+                    weight=pspec.weight if pspec.weight.magnitude > 0 else None,
                 )
             elif pspec.category is ComponentCategory.RESISTOR:
                 carbon = self.resistor_model.get_carbon(

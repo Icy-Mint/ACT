@@ -27,6 +27,7 @@ class SourceType(Enum):
     RESISTOR = auto()  # Manufacturing cost of Resistor components
     CAPACITOR = auto()  # Manufacturing cost of Capacitor components
     SWITCH = auto()  # Manufacturing cost of Switch components
+    INDUCTOR = auto()  # Manufacturing cost of Inductor components
     ENCLOSURE = auto()  # Enclosure cost like case, plastic frames, etc.
     OTHER = auto()  # Miscellaneous source type
 
