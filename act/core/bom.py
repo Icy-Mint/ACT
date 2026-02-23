@@ -85,7 +85,7 @@ class BOM:
 
         # convert the dictionary to unit'ed structure and specifications
         passives = dict()
-        if self.passives is not None:
+        if self.passives is not None:  # passive refers to everything that's not a main chip or physical structure.
             for cname, cdata in self.passives.items():
                 cat = ComponentCategory(cdata[CATEGORY])
                 if cat is ComponentCategory.CAPACITOR:
@@ -100,6 +100,8 @@ class BOM:
                     passives[cname] = DiodeSpec(**cdata)
                 elif cat is ComponentCategory.SWITCH:
                     passives[cname] = SwitchSpec(**cdata)
+                elif cat is ComponentCategory.ACTIVE:
+                    passives[cname] = OtherSpec(**cdata) # Active components are treated as other components
                 elif cat is ComponentCategory.OTHER:
                     passives[cname] = OtherType(**cdata)
                 else:

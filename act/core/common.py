@@ -197,6 +197,7 @@ class ComponentCategory(Enum):
     SIGNAL_BEAD = "signal bead"
     CONNECTOR = "connector"
     SWITCH = "switch"
+    ACTIVE = "active"
     OTHER = "other"
 
 class ModelType(Enum):
