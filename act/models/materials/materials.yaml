@@ -8,3 +8,6 @@ materials:
 
   # from https://ecoquery.ecoinvent.org/3.11/cutoff/dataset/1542/documentation
   Tin: 10.09629525 kg / kg
+
+  # from https://ecoquery.ecoinvent.org/3.11/cutoff/dataset/8476/documentation
+  bronze: 7.122581312 kg / kg

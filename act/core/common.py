@@ -200,6 +200,7 @@ class ComponentCategory(Enum):
     SWITCH = "switch"
     ACTIVE = "active"
     TIN = "tin" 
+    BRONZE = "bronze" 
     OTHER = "other"
 
 class ModelType(Enum):

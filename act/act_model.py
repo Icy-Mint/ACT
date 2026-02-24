@@ -36,6 +36,7 @@ from .core.switch_model import SwitchModel, DEFAULT_SWITCH_MODEL_FILE
 from .core.resistor_model import ResistorModel, DEFAULT_RESISTOR_MODEL_FILE
 from .core.inductor_model import InductorModel, DEFAULT_INDUCTOR_MODEL_FILE
 from .core.other_model import OtherModel, DEFAULT_OTHER_MODEL_FILE
+from .core.active_model import ActiveModel, DEFAULT_ACTIVE_MODEL_FILE
 from .core.utils import DEFAULT_LOCATION_CONFIG, DEFAULT_SOURCE_CONFIG
 
 
@@ -55,6 +56,7 @@ class ACTModel:
         switch_config=DEFAULT_SWITCH_MODEL_FILE,
         inductor_config=DEFAULT_INDUCTOR_MODEL_FILE,
         other_config=DEFAULT_OTHER_MODEL_FILE,
+        active_config=DEFAULT_ACTIVE_MODEL_FILE,
         loc_ci_config=DEFAULT_LOCATION_CONFIG,
         src_ci_config=DEFAULT_SOURCE_CONFIG,
     ):
@@ -72,6 +74,7 @@ class ACTModel:
             switch_config: Switch model configuration file
             resistor_config: Resistor model configuration file
             other_config: Other model configuration file
+            active_config: Active semiconductor model configuration file
             materials_config: Material model configuration file
             loc_ci_config: Location carbon intensity configuration file
             src_ci_config: Energy source carbon intensity configuration file
@@ -105,6 +108,7 @@ class ACTModel:
         self.switch_model = SwitchModel(model_file=switch_config)
         self.inductor_model = InductorModel(model_file=inductor_config)
         self.other_model = OtherModel(model_file=other_config)
+        self.active_model = ActiveModel(model_file=active_config)
         self.battery_model = BatteryModel()
 
         # save the last settings
@@ -280,6 +284,12 @@ class ACTModel:
                     component_type=pspec.type,
                     n_components=pspec.quantity,
                 )
+            elif pspec.category is ComponentCategory.ACTIVE:
+                carbon = self.active_model.get_carbon(
+                    weight=pspec.weight,
+                    active_type=pspec.type,
+                    n_components=pspec.quantity,
+                )
             else:
                 raise NotImplementedError(
                     f"Carbon model for component type {pspec.category} not implemented."
@@ -292,7 +302,7 @@ class ACTModel:
     def materials_analysis(self, materials):
         materials_results = dict()
         for pname, spec in materials.items():
-            if spec.category in [ComponentCategory.FRAME, ComponentCategory.ENCLOSURE,  ComponentCategory.TIN]:
+            if spec.category in [ComponentCategory.FRAME, ComponentCategory.ENCLOSURE,  ComponentCategory.TIN, ComponentCategory.BRONZE]:
                 carbon = self.materials_model.get_carbon(
                     mat=spec.type, weight=spec.weight
                 )

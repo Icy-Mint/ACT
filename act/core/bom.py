@@ -12,6 +12,7 @@ from .resistor_model import ResistorType
 from .switch_model import SwitchType
 from .inductor_model import InductorType
 from .other_model import OtherType
+from .active_model import ActiveType
 
 from .units import *
 import os
@@ -102,7 +103,7 @@ class BOM:
                 elif cat is ComponentCategory.SWITCH:
                     passives[cname] = SwitchSpec(**cdata)
                 elif cat is ComponentCategory.ACTIVE:
-                    passives[cname] = OtherSpec(**cdata) # Active components are treated as other components
+                    passives[cname] = ActiveSpec(**cdata)
                 elif cat is ComponentCategory.INDUCTOR:
                     passives[cname] = InductorType(**cdata)
                 elif cat is ComponentCategory.OTHER:
@@ -276,6 +277,15 @@ class OtherSpec(BaseSpec):
     def __post_init__(self):
         super().__post_init__()
         self.type = OtherType(self.type)
+
+@dataclass
+class ActiveSpec(BaseSpec):
+    type: str = ActiveType.GENERIC.value
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.type = ActiveType(self.type)
+
 def load_bom(materials_file: str, material_type: Enum):
     """Load the materials file and return a BOM data structure"""
 

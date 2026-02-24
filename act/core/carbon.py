@@ -29,6 +29,7 @@ class SourceType(Enum):
     SWITCH = auto()  # Manufacturing cost of Switch components
     INDUCTOR = auto()  # Manufacturing cost of Inductor components
     ENCLOSURE = auto()  # Enclosure cost like case, plastic frames, etc.
+    ACTIVE = auto()  # Manufacturing cost of active semiconductor components (transistors, MOSFETs, etc.)
     OTHER = auto()  # Miscellaneous source type
 
 
