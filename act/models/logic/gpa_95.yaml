@@ -1,4 +1,7 @@
 # GHG from fab as per Table 1 in ACT paper
+"130nm": 73.6 g / cm2   
+"65nm" : 70.7 g / cm2   
+"45nm" : 399 g / cm2
 "28nm" : 175 g / cm2
 "20nm" : 190 g / cm2
 "14nm" : 200 g / cm2
@@ -7,5 +10,3 @@
 "7nm"  : 350 g / cm2
 "5nm"  : 430 g / cm2
 "3nm"  : 470 g / cm2
-
-"45nm" : 399 g / cm2 
