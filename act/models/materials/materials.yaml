@@ -7,7 +7,7 @@ materials:
   alumnimum: 15.1 kg / kg
 
   # from https://ecoquery.ecoinvent.org/3.11/cutoff/dataset/1542/documentation
-  Tin: 10.09629525 kg / kg
+  tin: 10.09629525 kg / kg
 
   # from https://ecoquery.ecoinvent.org/3.11/cutoff/dataset/8476/documentation
   bronze: 7.122581312 kg / kg

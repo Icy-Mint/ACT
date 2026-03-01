@@ -35,7 +35,7 @@ class LogicProcess(Enum):
     """
     Enum representing different logic processes.
     """
-
+    N130 = "130nm"
     N65 = "65nm"
     N45 = "45nm"
     N40 = "40nm"

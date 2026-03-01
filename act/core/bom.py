@@ -105,9 +105,9 @@ class BOM:
                 elif cat is ComponentCategory.ACTIVE:
                     passives[cname] = ActiveSpec(**cdata)
                 elif cat is ComponentCategory.INDUCTOR:
-                    passives[cname] = InductorType(**cdata)
+                    passives[cname] = InductorSpec(**cdata)
                 elif cat is ComponentCategory.OTHER:
-                    passives[cname] = OtherType(**cdata)
+                    passives[cname] = OtherSpec(**cdata)
                 else:
                     raise NotImplementedError(
                         f"Materials specification category {cat} for materials list item {cname} not defined."
