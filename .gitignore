@@ -1,4 +1,29 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
 *.pyc
-__pycache__
-*.swp
-*.swo
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.log
+*.tmp
+
+# Raw data (optional - don't commit large Excel files)
+data/raw/*.xlsx
+data/raw/*.xls
