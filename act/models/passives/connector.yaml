@@ -14,5 +14,4 @@ pci: 112 kg / kg
 # Value: 9.38 kg CO2e / kg
 peripheral: 9.38 kg / kg
 
-# from https://ecoquery.ecoinvent.org/3.11/cutoff/dataset/8476/documentation
-bronze: 7.122581312 kg / kg
+

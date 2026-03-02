@@ -1,0 +1,5 @@
+name: BOM for RPi_4_BoM_Official
+description: Auto-generated from RPi_4_BoM_Official.xlsx
+silicon: {}
+materials: {}
+passives: {}
