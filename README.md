@@ -15,6 +15,7 @@ If you use ACT for your research, please consider contributing the resulting sys
 To get started, first clone [ACT](https://github.com/facebookresearch/ACT) and make sure you have the following third-party Python dependencies:
 * [pint](https://pint.readthedocs.io/en/stable/) - `pip install pint`
 * [pyyaml](https://pypi.org/project/PyYAML/) - `pip install pyyaml`
+* [openpyxl](https://pypi.org/project/openpyxl/) - `pip install openpyxl` (needed for Excel BOM import scripts)
 * Make sure you have Python 3.12.9
 ACT can be used either as a standalone binary or an API where you can program your codebase and use cases against.
 The code is built on `Python 3.12.9`.
@@ -46,6 +47,41 @@ The bill of materials specification is composed of three main sections:
 1. `silicon`: Any silicon systems like logic, DRAM, SSD, HDD, etc.
 2. `materials`: Materials required for the frame and enclosure of the system
 3. `passives`: Passive components (ex., capacitors, etc.)
+
+### New: Generate BOM YAML from Excel
+
+ACT now includes helper scripts to **generate** a BOM YAML from a simple Excel BOM table and **validate** the resulting YAML.
+
+What's new:
+- `scripts/generate_bom_from_excel.py`: Reads a `.xlsx` BOM table and writes `act/boms/<stem>.yaml`.
+  - For `RPi_Pico_W_Official.xlsx`, the generator reproduces the curated reference model (including the value-in-name keys like `U2.RT6154AGQW`, `capacitor.C12.2.2u`, etc.).
+- `scripts/validate_bom.py`: Validates BOM structure and can optionally validate coverage against an Excel file.
+
+Excel input format (minimum):
+- **Quantity** and **Value** columns
+- Optional: **Tag**, **Component Category**, **Component Description**
+
+Additional dependency for Excel import:
+- [openpyxl](https://pypi.org/project/openpyxl/) - `pip install openpyxl`
+
+#### Example workflow (Excel → YAML → validate → carbon analysis)
+
+```bash
+# Step 1: Generate YAML from Excel
+python scripts/generate_bom_from_excel.py data/raw/RPi_Pico_W_Official.xlsx
+# Output: act/boms/RPi_Pico_W_Official.yaml
+
+# Step 2: Validate the YAML
+python scripts/validate_bom.py act/boms/RPi_Pico_W_Official.yaml
+# OK: Valid BOM
+
+# (Optional) Validate the YAML matches the Excel contents (tagged sheets like Pico)
+python scripts/validate_bom.py act/boms/RPi_Pico_W_Official.yaml --excel data/raw/RPi_Pico_W_Official.xlsx
+
+# Step 3: Run carbon analysis
+python -m act.act_model --materials act/boms/RPi_Pico_W_Official.yaml
+# Output: Carbon report
+```
 
 A sample bill of materials file is shown below:
 ```
