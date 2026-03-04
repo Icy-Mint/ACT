@@ -11,3 +11,9 @@ materials:
 
   # from https://ecoquery.ecoinvent.org/3.11/cutoff/dataset/8476/documentation
   bronze: 7.122581312 kg / kg
+
+  # Pb-free solder (Sn-Ag-Cu alloy, RoHS compliant)
+  # Dataset: market for mounting, through-hole technology, Pb-free solder
+  # Source: Ecoinvent 3.11 cutoff database
+  # Higher than pure tin due to silver/copper alloying elements and processing
+  pb_free_solder: 46.48635406 kg / kg

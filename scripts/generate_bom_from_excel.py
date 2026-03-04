@@ -19,6 +19,8 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import math
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -84,6 +86,81 @@ def _split_tags(tag_cell: Any) -> list[str]:
     return [t.strip() for t in tag_s.split(",") if t.strip()]
 
 
+def _is_missing(v: Any) -> bool:
+    """Return True if value is None, empty string, or NaN float."""
+    if v is None:
+        return True
+    if isinstance(v, float) and math.isnan(v):
+        return True
+    if isinstance(v, str) and not v.strip():
+        return True
+    return False
+
+
+def _to_float(v: Any) -> float | None:
+    """Convert a value to float, returning None if not possible or missing."""
+    if _is_missing(v):
+        return None
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
+def _convert_process_node(value: Any) -> str:
+    """Convert 28.0 or '28' to '28nm'; pass through 'lpddr2_20nm' style strings."""
+    if _is_missing(value):
+        return "45nm"
+    value_str = str(value).strip()
+    if "nm" in value_str or "_" in value_str:
+        return value_str
+    try:
+        num = int(float(value_str))
+        return f"{num}nm"
+    except (TypeError, ValueError):
+        return "45nm"
+
+
+def _area_str(area_mm2: float) -> str | None:
+    """Return area as 'X mm2' for small ICs or 'X.XXXX cm2' for large dies/PCBs."""
+    if area_mm2 is None or (isinstance(area_mm2, float) and math.isnan(area_mm2)):
+        return None
+    if area_mm2 <= 0:
+        return None
+    if area_mm2 < 100:
+        return f"{area_mm2} mm2"
+    return f"{area_mm2 / 100:.4f} cm2"
+
+
+_STANDARD_PACKAGES = {"0201", "0402", "0603", "0805", "1005", "1206"}
+_METRIC_TO_IMPERIAL = {"1005": "0402", "1608": "0603", "2012": "0805", "3216": "1206"}
+
+
+def _fmt_weight(kg: float) -> str:
+    """Format a weight value cleanly, e.g. 0.0016899999999999999 → '0.00169 kg'."""
+    return f"{kg:.6g} kg"
+
+
+def _extract_package_size(pkg_raw: Any, desc: str) -> str:
+    """Extract standard package size code from package column or description string."""
+    if not _is_missing(pkg_raw):
+        pkg_clean = str(pkg_raw).strip().replace("mm", "").replace(" ", "")
+        if pkg_clean in _STANDARD_PACKAGES:
+            return pkg_clean
+        for metric, imperial in _METRIC_TO_IMPERIAL.items():
+            if metric in pkg_clean:
+                return imperial
+
+    search_str = desc or ""
+    for pkg in _STANDARD_PACKAGES:
+        if re.search(r"\b" + pkg + r"\b", search_str):
+            return pkg
+    for metric, imperial in _METRIC_TO_IMPERIAL.items():
+        if re.search(r"\b" + metric + r"\b", search_str):
+            return imperial
+    return "0603"
+
+
 def read_excel_bom_table(excel_file: Path) -> list[dict[str, Any]]:
     openpyxl = _require(
         "openpyxl",
@@ -92,50 +169,77 @@ def read_excel_bom_table(excel_file: Path) -> list[dict[str, Any]]:
     wb = openpyxl.load_workbook(excel_file, data_only=True)
     ws = wb.active
 
-    # Find header row (expect columns like Tag/Quantity/Value)
+    # Normalised header text → internal field name.
+    # Duplicate column headers (e.g. two "SoC technology nodes" columns) are
+    # handled below by appending "_alt" for the second occurrence.
+    _HEADER_TO_FIELD: dict[str, str] = {
+        "tag": "tag",
+        "quantity": "quantity",
+        "component category": "category",
+        "component description": "description",
+        "weight (kg)": "weight_kg",
+        "part number": "part_number",
+        "area (sq mm)": "area_sq_mm",
+        "layers": "layers",
+        "thickness (mm)": "thickness_mm",
+        "package size (mm)": "package_size_mm",
+        "package to die ratio": "package_to_die_ratio",
+        "die size (mm2)": "die_size_mm2",
+        "soc technology nodes": "soc_process",
+        "gb": "gb",
+        "capacity": "capacity",
+        "process": "process",
+        "memory emissions factor g co2e": "memory_emission_factor",
+        "type": "type",
+    }
+
+    # Find header row; col_map maps field_name → column index (1-based)
     header_row = None
-    header_map: dict[str, int] = {}
+    col_map: dict[str, int] = {}
     for r in range(1, min(15, ws.max_row) + 1):
         row = [_norm_header(ws.cell(r, c).value) for c in range(1, ws.max_column + 1)]
-        if "quantity" in row and any(h.startswith("value") for h in row):
-            header_row = r
-            for idx, h in enumerate(row, start=1):
-                if h in ("tag", "quantity", "component category", "component description"):
-                    header_map[h] = idx
-                elif h.startswith("value"):
-                    header_map["value"] = idx
-            break
+        if "quantity" not in row or not any(h.startswith("value") for h in row):
+            continue
 
-    if header_row is None or "quantity" not in header_map or "value" not in header_map:
+        header_row = r
+        seen_raw: dict[str, int] = {}
+        for idx, h in enumerate(row, start=1):
+            if not h:
+                continue
+            seen_raw[h] = seen_raw.get(h, 0) + 1
+            occurrence = seen_raw[h]
+
+            if h.startswith("value"):
+                col_map.setdefault("value", idx)
+                continue
+
+            if h in _HEADER_TO_FIELD:
+                field = _HEADER_TO_FIELD[h]
+                if occurrence == 1:
+                    col_map.setdefault(field, idx)
+                else:
+                    col_map.setdefault(field + "_alt", idx)
+        break
+
+    if header_row is None or "quantity" not in col_map or "value" not in col_map:
         raise ValueError(
             f"Could not find a header row with Quantity/Value in {excel_file}"
         )
 
+    def _cell(r: int, field: str) -> Any:
+        idx = col_map.get(field)
+        return ws.cell(r, idx).value if idx else None
+
     entries: list[dict[str, Any]] = []
     for r in range(header_row + 1, ws.max_row + 1):
-        tag_cell = (
-            ws.cell(r, header_map.get("tag", 1)).value if "tag" in header_map else None
-        )
-        qty_cell = ws.cell(r, header_map["quantity"]).value
-        value_cell = ws.cell(r, header_map["value"]).value
-        cat_cell = (
-            ws.cell(r, header_map.get("component category", 0)).value
-            if "component category" in header_map
-            else None
-        )
-        desc_cell = (
-            ws.cell(r, header_map.get("component description", 0)).value
-            if "component description" in header_map
-            else None
-        )
+        tag_cell = _cell(r, "tag")
+        qty_cell = _cell(r, "quantity")
+        value_cell = _cell(r, "value")
+        cat_cell = _cell(r, "category")
+        desc_cell = _cell(r, "description")
 
-        if (
-            tag_cell is None
-            and qty_cell is None
-            and value_cell is None
-            and cat_cell is None
-            and desc_cell is None
-        ):
+        # Skip completely empty rows
+        if all(_is_missing(v) for v in [tag_cell, qty_cell, value_cell, cat_cell, desc_cell]):
             continue
 
         tags = _split_tags(tag_cell)
@@ -154,6 +258,22 @@ def read_excel_bom_table(excel_file: Path) -> list[dict[str, Any]]:
                 "value": _as_str(value_cell),
                 "category": _as_str(cat_cell),
                 "description": _as_str(desc_cell),
+                # Extended fields
+                "weight_kg": _to_float(_cell(r, "weight_kg")),
+                "part_number": _as_str(_cell(r, "part_number")),
+                "area_sq_mm": _to_float(_cell(r, "area_sq_mm")),
+                "layers": _to_float(_cell(r, "layers")),
+                "thickness_mm": _to_float(_cell(r, "thickness_mm")),
+                "package_size_mm": _cell(r, "package_size_mm"),
+                "package_to_die_ratio": _to_float(_cell(r, "package_to_die_ratio")),
+                "die_size_mm2": _to_float(_cell(r, "die_size_mm2")),
+                "soc_process": _cell(r, "soc_process"),
+                "soc_process_alt": _cell(r, "soc_process_alt"),
+                "gb": _to_float(_cell(r, "gb")),
+                "capacity": _to_float(_cell(r, "capacity")),
+                "process": _as_str(_cell(r, "process")),
+                "memory_emission_factor": _to_float(_cell(r, "memory_emission_factor")),
+                "type": _as_str(_cell(r, "type")),
             }
         )
 
@@ -362,70 +482,255 @@ def build_generic_bom(entries: list[dict[str, Any]], *, stem: str, excel_name: s
     }
 
     ic_defaults = {"fab_yield": 0.875, "gpa": 95, "fab_ci": "coal"}
-
     counters: dict[str, int] = {}
 
     def next_id(kind: str) -> str:
         counters[kind] = counters.get(kind, 0) + 1
         return f"{counters[kind]:03d}"
 
+    def _ic_key(prefix: str, tags: list[str], value: str, part_slug: str) -> str:
+        """Build a silicon key from tag or slug, with counter fallback."""
+        if tags:
+            tag = tags[0]
+            v_slug = _key_suffix(value) if value else ""
+            return f"{prefix}.{tag}.{v_slug}" if v_slug else f"{prefix}.{tag}"
+        if part_slug:
+            return f"{prefix}.{part_slug}"
+        return f"{prefix}.main{next_id(prefix.rsplit('.', 1)[-1])}"
+
+    def _passive_key(prefix: str, counter_key: str, tags: list[str]) -> str:
+        """Build a passives key from tag or counter."""
+        if tags:
+            return f"{prefix}.{tags[0]}"
+        return f"{prefix}.{counter_key}_{next_id(counter_key)}"
+
     for e in entries:
         qty = e["quantity"] or 1
         cat = (e["category"] or "").lower()
         desc = e["description"] or e["value"] or ""
-        part = _extract_part_from_description(desc)
-        part_slug = _slug(part)
-
         tags = e["tags"]
-        if tags:
-            base_tag = tags[0]
-            key_suffix = _key_suffix(e["value"])
-            key = f"{base_tag}.{key_suffix}" if key_suffix else base_tag
-            if base_tag.startswith("U"):
-                bom["silicon"][key] = {
-                    "process": "45nm",
-                    "n_ics": qty,
-                    **ic_defaults,
-                }
-            else:
-                bom["passives"][key] = {"category": "other", "quantity": qty}
+        value = e["value"] or ""
+
+        # Extended fields
+        die_size_mm2 = e.get("die_size_mm2")
+        # Prefer the second SoC technology nodes column (more specific) when present
+        soc_process_raw = e.get("soc_process_alt") or e.get("soc_process")
+        mem_process = e.get("process") or ""
+        area_sq_mm = e.get("area_sq_mm")
+        # For IC/CPU die area: Die Size (mm2) is authoritative; Area (sq mm) is the
+        # fallback because some BOMs store the die area there instead of a PCB area.
+        ic_die_mm2 = die_size_mm2 if die_size_mm2 is not None else area_sq_mm
+        layers = e.get("layers")
+        thickness_mm = e.get("thickness_mm")
+        package_size_mm = e.get("package_size_mm")
+        weight_kg = e.get("weight_kg")
+        capacity_gb = e.get("gb") or e.get("capacity")
+
+        part_slug = _slug(_extract_part_from_description(desc))
+
+        # ── Classify component ───────────────────────────────────────────────────
+        desc_lower = desc.lower()
+        cat_desc = cat + " " + desc_lower  # combined for keyword matching
+
+        # Material flags are evaluated first so they can exclude IC mis-classification.
+        is_pcb = any(
+            x in cat_desc
+            for x in ("laminate", "pcb", "motherboard", "epoxy glass", "printed circuit")
+        )
+        is_solder = "solder" in cat
+        is_shield = "shield" in cat
+
+        is_ram = any(x in cat_desc for x in ("ram", "dram", "lpddr", "sdram", "memory"))
+        is_flash = (not is_ram) and any(
+            x in cat_desc for x in ("flash", "nand", "emmc", "ssd", "storage")
+        )
+        is_cpu = (not is_pcb) and any(
+            x in cat_desc
+            for x in ("processor", "soc", "cpu", "microprocessor", "application processor")
+        )
+        is_ic = (not is_ram) and (not is_flash) and (not is_cpu) and (not is_pcb) and any(
+            x in cat_desc
+            for x in (
+                "integrated circuit",
+                "controller",
+                "transceiver",
+                "semiconductor",
+                "amplifier",
+                "ic ",
+                " ic",
+            )
+        )
+        # Tag-based IC fallback: U* tags without a category are treated as ICs
+        if not any([is_ram, is_flash, is_cpu, is_ic, is_pcb]) and tags and tags[0].startswith("U"):
+            is_ic = True
+
+        is_connector = any(x in cat for x in ("connector", "header", "port", "socket"))
+        is_capacitor = "capacitor" in cat
+        is_resistor = "resistor" in cat
+        is_inductor = "inductor" in cat
+        is_diode = "diode" in cat or "led" in cat or "tvs" in cat
+
+        # ── Silicon ──────────────────────────────────────────────────────────────
+        if is_ram:
+            key = _ic_key("memory" if tags else "dram", tags, value, part_slug)
+            spec: dict[str, Any] = {"model": "dram", "n_ics": qty, "fab_yield": 0.875}
+            if capacity_gb is not None:
+                spec["capacity"] = f"{int(capacity_gb)} GB"
+            spec["process"] = (
+                _convert_process_node(mem_process) if mem_process else "ddr3_50nm"
+            )
+            bom["silicon"][key] = spec
             continue
 
-        if "capacitor" in cat:
-            key = f"capacitor.cap_{next_id('cap')}.{part_slug}"
-            bom["passives"][key] = {"category": "capacitor", "quantity": qty}
-        elif "resistor" in cat:
-            key = f"resistor.res_{next_id('res')}.{part_slug}"
-            bom["passives"][key] = {"category": "resistor", "quantity": qty}
-        elif "inductor" in cat:
-            key = f"inductor.ind_{next_id('ind')}.{part_slug}"
-            bom["passives"][key] = {"category": "inductor", "quantity": qty}
-        elif "diode" in cat or "led" in cat or "tvs" in cat:
-            key = f"diode.dio_{next_id('dio')}.{part_slug}"
-            bom["passives"][key] = {"category": "diode", "quantity": qty}
-        elif "connector" in cat or "header" in cat or "port" in cat or "socket" in cat:
-            key = f"connector.con_{next_id('con')}.{part_slug}"
-            bom["passives"][key] = {"category": "connector", "quantity": qty}
-        elif "laminate" in cat or "epoxy glass" in cat or "motherboard" in desc.lower():
-            key = f"pcb.pcb_{next_id('pcb')}.{part_slug}"
-            bom["materials"][key] = {"category": "pcb", "quantity": qty}
-        elif "solder" in cat:
-            key = f"material.solder_{next_id('solder')}.{part_slug}"
-            bom["materials"][key] = {"category": "enclosure", "quantity": qty}
-        elif "shield" in cat:
-            key = f"material.shield_{next_id('shield')}.{part_slug}"
-            bom["materials"][key] = {"category": "tin", "quantity": qty}
-        else:
-            if any(x in cat for x in ("ic", "processor", "controller", "transceiver", "ram")):
-                key = f"ic_{next_id('ic')}.{part_slug}"
-                bom["silicon"][key] = {
-                    "process": "45nm",
+        if is_flash:
+            key = _ic_key("ssd", tags, value, part_slug)
+            spec = {"model": "flash", "n_ics": qty, "fab_yield": 0.875}
+            if capacity_gb is not None:
+                spec["capacity"] = f"{int(capacity_gb)} GB"
+            spec["process"] = (
+                _convert_process_node(mem_process) if mem_process else "nand_30nm"
+            )
+            bom["silicon"][key] = spec
+            continue
+
+        if is_cpu:
+            key = _ic_key("cpu", tags, value, part_slug)
+            spec = {"n_ics": qty, **ic_defaults}
+            if ic_die_mm2 is not None:
+                area = _area_str(ic_die_mm2)
+                if area:
+                    spec["area"] = area
+            spec["process"] = (
+                _convert_process_node(soc_process_raw)
+                if not _is_missing(soc_process_raw)
+                else "28nm"
+            )
+            bom["silicon"][key] = spec
+            continue
+
+        if is_ic:
+            key = _ic_key("ics", tags, value, part_slug)
+            spec = {"n_ics": qty, **ic_defaults}
+            if ic_die_mm2 is not None:
+                area = _area_str(ic_die_mm2)
+                if area:
+                    spec["area"] = area
+            spec["process"] = (
+                _convert_process_node(soc_process_raw)
+                if not _is_missing(soc_process_raw)
+                else "45nm"
+            )
+            bom["silicon"][key] = spec
+            continue
+
+        # ── Materials ────────────────────────────────────────────────────────────
+        if is_pcb:
+            key = "pcb" if "pcb" not in bom["materials"] else f"pcb_{next_id('pcb')}"
+            spec = {"category": "pcb"}
+            if area_sq_mm is not None and area_sq_mm > 0:
+                spec["area"] = f"{area_sq_mm / 100:.4f} cm2"
+            if layers is not None:
+                spec["layers"] = int(layers)
+            if thickness_mm is not None:
+                spec["thickness"] = f"{thickness_mm} mm"
+            if not any(k for k in spec if k != "category"):
+                spec["quantity"] = qty
+            bom["materials"][key] = spec
+            continue
+
+        if is_solder:
+            is_pb_free = any(
+                x in cat_desc for x in ("pb-free", "pb free", "lead-free", "lead free", "pbfree", "rohs")
+            )
+            if is_pb_free:
+                key = "solder.pbfree" if "solder.pbfree" not in bom["materials"] else f"solder.pbfree{next_id('solder')}"
+                spec = {"category": "pb_free_solder", "type": "pb_free_solder"}
+            else:
+                key = "solder" if "solder" not in bom["materials"] else f"solder.tin{next_id('solder')}"
+                spec = {"category": "tin", "type": "tin"}
+            if weight_kg is not None and weight_kg > 0:
+                spec["weight"] = _fmt_weight(weight_kg)
+            else:
+                spec["quantity"] = qty
+            bom["materials"][key] = spec
+            continue
+
+        if is_shield:
+            key = f"shield.metal{next_id('shield')}"
+            spec = {"category": "tin", "type": "tin"}
+            if weight_kg is not None and weight_kg > 0:
+                spec["weight"] = _fmt_weight(weight_kg)
+            else:
+                spec["quantity"] = qty
+            bom["materials"][key] = spec
+            continue
+
+        # ── Passives ─────────────────────────────────────────────────────────────
+        if is_connector:
+            key = _passive_key("connector", "con", tags)
+            spec = {"category": "connector", "type": "peripheral", "quantity": qty}
+            if weight_kg is not None and weight_kg > 0:
+                spec["weight"] = _fmt_weight(weight_kg)
+            bom["passives"][key] = spec
+            continue
+
+        if is_capacitor:
+            key = _passive_key("capacitor", "cap", tags)
+            pkg = _extract_package_size(package_size_mm, desc)
+            bom["passives"][key] = {"category": "capacitor", "type": pkg, "quantity": qty}
+            continue
+
+        if is_resistor:
+            key = _passive_key("resistor", "res", tags)
+            pkg = _extract_package_size(package_size_mm, desc)
+            bom["passives"][key] = {"category": "resistor", "type": pkg, "quantity": qty}
+            continue
+
+        if is_inductor:
+            key = _passive_key("inductor", "ind", tags)
+            spec = {"category": "inductor", "quantity": qty}
+            if weight_kg is not None and weight_kg > 0:
+                spec["type"] = "weight_based"
+                spec["weight"] = _fmt_weight(weight_kg)
+            else:
+                spec["type"] = _extract_package_size(package_size_mm, desc)
+            bom["passives"][key] = spec
+            continue
+
+        if is_diode:
+            key = _passive_key("diode", "dio", tags)
+            dtype = "led" if "led" in cat else "glass_smd"
+            spec = {"category": "diode", "type": dtype, "quantity": qty}
+            if weight_kg is not None and weight_kg > 0:
+                spec["weight"] = _fmt_weight(weight_kg)
+            bom["passives"][key] = spec
+            continue
+
+        # ── Fallback ─────────────────────────────────────────────────────────────
+        if tags:
+            base_tag = tags[0]
+            key_sfx = _key_suffix(value)
+            key = f"{base_tag}.{key_sfx}" if key_sfx else base_tag
+            if base_tag.startswith("U"):
+                spec = {
+                    "process": (
+                        _convert_process_node(soc_process_raw)
+                        if not _is_missing(soc_process_raw)
+                        else "45nm"
+                    ),
                     "n_ics": qty,
                     **ic_defaults,
                 }
+                if ic_die_mm2 is not None:
+                    area = _area_str(ic_die_mm2)
+                    if area:
+                        spec["area"] = area
+                bom["silicon"][key] = spec
             else:
-                key = f"other.other_{next_id('other')}.{part_slug}"
                 bom["passives"][key] = {"category": "other", "quantity": qty}
+        else:
+            key = f"other.other_{next_id('other')}.{part_slug}"
+            bom["passives"][key] = {"category": "other", "quantity": qty}
 
     return bom
 

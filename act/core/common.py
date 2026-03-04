@@ -199,8 +199,9 @@ class ComponentCategory(Enum):
     CONNECTOR = "connector"
     SWITCH = "switch"
     ACTIVE = "active"
-    TIN = "tin" 
-    BRONZE = "bronze" 
+    TIN = "tin"
+    BRONZE = "bronze"
+    PB_FREE_SOLDER = "pb_free_solder"
     OTHER = "other"
 
 class ModelType(Enum):

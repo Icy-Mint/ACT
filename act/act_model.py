@@ -302,9 +302,22 @@ class ACTModel:
     def materials_analysis(self, materials):
         materials_results = dict()
         for pname, spec in materials.items():
-            if spec.category in [ComponentCategory.FRAME, ComponentCategory.ENCLOSURE,  ComponentCategory.TIN, ComponentCategory.BRONZE]:
+            if spec.category in [
+                ComponentCategory.FRAME,
+                ComponentCategory.ENCLOSURE,
+                ComponentCategory.TIN,
+                ComponentCategory.BRONZE,
+                ComponentCategory.PB_FREE_SOLDER,
+            ]:
+                # If no explicit type was given (type==NA), fall back to the
+                # category name as the material key (e.g. "tin" → tin emission factor).
+                mat = (
+                    spec.type
+                    if spec.type.value != "na"
+                    else type(spec.type)(spec.category.value)
+                )
                 carbon = self.materials_model.get_carbon(
-                    mat=spec.type, weight=spec.weight
+                    mat=mat, weight=spec.weight
                 )
             elif spec.category is ComponentCategory.PCB:
                 carbon = self.pcb_model.get_carbon(
