@@ -202,6 +202,7 @@ class ComponentCategory(Enum):
     TIN = "tin"
     BRONZE = "bronze"
     PB_FREE_SOLDER = "pb_free_solder"
+    ALUMINUM = "aluminum"
     OTHER = "other"
 
 class ModelType(Enum):

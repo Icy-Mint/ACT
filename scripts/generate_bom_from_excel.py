@@ -539,6 +539,9 @@ def build_generic_bom(entries: list[dict[str, Any]], *, stem: str, excel_name: s
         )
         is_solder = "solder" in cat
         is_shield = "shield" in cat
+        is_aluminum = (not is_solder) and (not is_shield) and any(
+            x in cat_desc for x in ("alumin", "aluminum", "aluminium")
+        )
 
         is_ram = any(x in cat_desc for x in ("ram", "dram", "lpddr", "sdram", "memory"))
         is_flash = (not is_ram) and any(
@@ -658,6 +661,16 @@ def build_generic_bom(entries: list[dict[str, Any]], *, stem: str, excel_name: s
         if is_shield:
             key = f"shield.metal{next_id('shield')}"
             spec = {"category": "tin", "type": "tin"}
+            if weight_kg is not None and weight_kg > 0:
+                spec["weight"] = _fmt_weight(weight_kg)
+            else:
+                spec["quantity"] = qty
+            bom["materials"][key] = spec
+            continue
+
+        if is_aluminum:
+            key = f"aluminum.alu{next_id('alu')}" if "aluminum" in bom["materials"] else "aluminum"
+            spec = {"category": "aluminum", "type": "aluminum"}
             if weight_kg is not None and weight_kg > 0:
                 spec["weight"] = _fmt_weight(weight_kg)
             else:

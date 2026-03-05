@@ -308,6 +308,7 @@ class ACTModel:
                 ComponentCategory.TIN,
                 ComponentCategory.BRONZE,
                 ComponentCategory.PB_FREE_SOLDER,
+                ComponentCategory.ALUMINUM,
             ]:
                 # If no explicit type was given (type==NA), fall back to the
                 # category name as the material key (e.g. "tin" → tin emission factor).

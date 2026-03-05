@@ -206,7 +206,8 @@ silicon:
 materials:
   solder:
     category: tin
-    weight: 0.0016899999999999999 kg
+    type: tin
+    weight: 0.00169 kg
   pcb:
     category: pcb
     area: 47.6000 cm2
@@ -214,13 +215,14 @@ materials:
     thickness: 0.26666666666666666 mm
   shield.metal001:
     category: tin
+    type: tin
     weight: 0.0003 kg
 passives:
   connector.con_001:
     category: connector
     type: peripheral
     quantity: 1
-    weight: 0.0021999999999999997 kg
+    weight: 0.0022 kg
   connector.con_002:
     category: connector
     type: peripheral
@@ -230,7 +232,7 @@ passives:
     category: connector
     type: peripheral
     quantity: 1
-    weight: 0.0060999999999999995 kg
+    weight: 0.0061 kg
   connector.con_004:
     category: connector
     type: peripheral
@@ -245,12 +247,12 @@ passives:
     category: diode
     type: glass_smd
     quantity: 2
-    weight: 8.999999999999999e-05 kg
+    weight: 9e-05 kg
   diode.dio_002:
     category: diode
     type: led
     quantity: 1
-    weight: 0.00011899999999999999 kg
+    weight: 0.000119 kg
   connector.con_006:
     category: connector
     type: peripheral
@@ -260,7 +262,7 @@ passives:
     category: connector
     type: peripheral
     quantity: 1
-    weight: 0.00021999999999999998 kg
+    weight: 0.00022 kg
   diode.dio_003:
     category: diode
     type: glass_smd
@@ -284,12 +286,12 @@ passives:
     category: diode
     type: glass_smd
     quantity: 1
-    weight: 2.9999999999999997e-05 kg
+    weight: 3e-05 kg
   connector.con_008:
     category: connector
     type: peripheral
     quantity: 2
-    weight: 0.00039999999999999996 kg
+    weight: 0.0004 kg
   other.other_001.X25M000000S305:
     category: other
     quantity: 2
@@ -297,7 +299,7 @@ passives:
     category: diode
     type: glass_smd
     quantity: 1
-    weight: 2.4999999999999998e-05 kg
+    weight: 2.5e-05 kg
   inductor.ind_001:
     category: inductor
     quantity: 4
@@ -345,22 +347,22 @@ passives:
     category: inductor
     quantity: 1
     type: weight_based
-    weight: 1.7000000000000001e-07 kg
+    weight: 1.7e-07 kg
   inductor.ind_004:
     category: inductor
     quantity: 1
     type: weight_based
-    weight: 1.7000000000000001e-07 kg
+    weight: 1.7e-07 kg
   inductor.ind_005:
     category: inductor
     quantity: 1
     type: weight_based
-    weight: 1.7000000000000001e-07 kg
+    weight: 1.7e-07 kg
   inductor.ind_006:
     category: inductor
     quantity: 1
     type: weight_based
-    weight: 1.7000000000000001e-07 kg
+    weight: 1.7e-07 kg
   resistor.res_007:
     category: resistor
     type: '0603'
@@ -394,7 +396,7 @@ passives:
     category: connector
     type: peripheral
     quantity: 2
-    weight: 1.7000000000000001e-07 kg
+    weight: 1.7e-07 kg
   inductor.ind_008:
     category: inductor
     quantity: 4
