@@ -10,3 +10,8 @@ generic: 63.5 kg / kg
 # Dataset: market for electronic component, passive, unspecified
 # Source: https://ecoquery.ecoinvent.org/3.11/cutoff/dataset/1666/documentation
 passive_generic: 63.5 kg / kg
+
+# Inductor, low value multilayer chip
+# Dataset: market for inductor, low value multilayer chip
+# Source: https://ecoquery.ecoinvent.org/3.11/cutoff/dataset/7714/documentation
+inductor_multilayer: 42.55306161 kg / kg
