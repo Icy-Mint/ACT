@@ -15,7 +15,6 @@ DEFAULT_OTHER_MODEL_FILE = f"{ACT_ROOT}/models/passives/other.yaml"
 class OtherType(Enum):
     """Enumeration of other passive component types"""
     PASSIVE_GENERIC = "passive_generic"  # Generic passive component
-    ACTIVE_GENERIC = "active_generic"    # Generic active component
     GENERIC = "generic"  # Generic (defaults to passive)
 
 
