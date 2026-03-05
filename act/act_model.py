@@ -351,13 +351,16 @@ class ACTModel:
         )
         export_data.update(query_settings=query_dict)
 
+        def _fmt_qty(qty):
+            return f"{qty.magnitude:.6f}".rstrip('0').rstrip('.') + f" {qty.units}"
+
         # log the total carbon
-        export_data.update(total_carbon=str(total_carbon.total().to(self.weight_unit)))
+        export_data.update(total_carbon=_fmt_qty(total_carbon.total().to(self.weight_unit)))
 
         # generate the result report by category
         result_by_cat_dict = dict()
         for src in SourceType:
-            result_by_cat_dict[src.name] = str(
+            result_by_cat_dict[src.name] = _fmt_qty(
                 total_carbon.partial(src).to(self.weight_unit)
             )
         export_data.update(result_by_category=result_by_cat_dict)
@@ -368,7 +371,7 @@ class ACTModel:
         silicon_results = dict()
         for dev, carbon in self.silicon_results.items():
             dev_dict = {
-                ctype.name: str(amt.to(self.weight_unit))
+                ctype.name: _fmt_qty(amt.to(self.weight_unit))
                 for ctype, amt in carbon.carbon_by_type.items()
             }
             silicon_results[dev] = dev_dict
@@ -377,7 +380,7 @@ class ACTModel:
         materials_results = dict()
         for dev, carbon in self.materials_results.items():
             dev_dict = {
-                ctype.name: str(amt.to(self.weight_unit))
+                ctype.name: _fmt_qty(amt.to(self.weight_unit))
                 for ctype, amt in carbon.carbon_by_type.items()
             }
             materials_results[dev] = dev_dict
@@ -386,7 +389,7 @@ class ACTModel:
         passives_results = dict()
         for dev, carbon in self.passives_results.items():
             dev_dict = {
-                ctype.name: str(amt.to(self.weight_unit))
+                ctype.name: _fmt_qty(amt.to(self.weight_unit))
                 for ctype, amt in carbon.carbon_by_type.items()
             }
             passives_results[dev] = dev_dict
