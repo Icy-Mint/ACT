@@ -140,10 +140,19 @@ def _load_excel_entries(excel_file: Path) -> list[dict[str, Any]]:
         if "quantity" in row and any(h.startswith("value") for h in row):
             header_row = r
             for idx, h in enumerate(row, start=1):
-                if h in ("tag", "quantity", "component category", "component description"):
-                    header_map[h] = idx
+                if h == "tag":
+                    header_map.setdefault("tag", idx)
+                elif h == "quantity":
+                    header_map.setdefault("quantity", idx)
+                elif h == "component category(act)":
+                    # ACT-specific category column takes priority
+                    header_map["component category"] = idx
+                elif h == "component category" and "component category" not in header_map:
+                    header_map["component category"] = idx
+                elif h == "component description":
+                    header_map.setdefault("component description", idx)
                 elif h.startswith("value"):
-                    header_map["value"] = idx
+                    header_map.setdefault("value", idx)
             break
 
     if header_row is None or "quantity" not in header_map or "value" not in header_map:

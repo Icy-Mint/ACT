@@ -132,8 +132,7 @@ def _area_str(area_mm2: float) -> str | None:
     return f"{area_mm2 / 100:.4f} cm2"
 
 
-_STANDARD_PACKAGES = {"0201", "0402", "0603", "0805", "1005", "1206"}
-_METRIC_TO_IMPERIAL = {"1005": "0402", "1608": "0603", "2012": "0805", "3216": "1206"}
+_STANDARD_PACKAGES = {"0201", "0402", "0603", "0805"}
 
 
 def _fmt_weight(kg: float) -> str:
@@ -147,17 +146,11 @@ def _extract_package_size(pkg_raw: Any, desc: str) -> str:
         pkg_clean = str(pkg_raw).strip().replace("mm", "").replace(" ", "")
         if pkg_clean in _STANDARD_PACKAGES:
             return pkg_clean
-        for metric, imperial in _METRIC_TO_IMPERIAL.items():
-            if metric in pkg_clean:
-                return imperial
 
     search_str = desc or ""
     for pkg in _STANDARD_PACKAGES:
         if re.search(r"\b" + pkg + r"\b", search_str):
             return pkg
-    for metric, imperial in _METRIC_TO_IMPERIAL.items():
-        if re.search(r"\b" + metric + r"\b", search_str):
-            return imperial
     return "0603"
 
 
@@ -175,7 +168,9 @@ def read_excel_bom_table(excel_file: Path) -> list[dict[str, Any]]:
     _HEADER_TO_FIELD: dict[str, str] = {
         "tag": "tag",
         "quantity": "quantity",
-        "component category": "category",
+        "component category": "category",           # backward compat (Pico sheet)
+        "component category(act)": "category_act",  # ACT-specific category (preferred)
+        "component category(manufacturer)": "category_mfr",
         "component description": "description",
         "weight (kg)": "weight_kg",
         "part number": "part_number",
@@ -191,6 +186,7 @@ def read_excel_bom_table(excel_file: Path) -> list[dict[str, Any]]:
         "process": "process",
         "memory emissions factor g co2e": "memory_emission_factor",
         "type": "type",
+        "packaging": "packaging",
     }
 
     # Find header row; col_map maps field_name → column index (1-based)
@@ -235,11 +231,12 @@ def read_excel_bom_table(excel_file: Path) -> list[dict[str, Any]]:
         tag_cell = _cell(r, "tag")
         qty_cell = _cell(r, "quantity")
         value_cell = _cell(r, "value")
-        cat_cell = _cell(r, "category")
+        cat_act_cell = _cell(r, "category_act")   # Component Category(ACT)
+        cat_cell = _cell(r, "category")            # backward-compat generic header
         desc_cell = _cell(r, "description")
 
         # Skip completely empty rows
-        if all(_is_missing(v) for v in [tag_cell, qty_cell, value_cell, cat_cell, desc_cell]):
+        if all(_is_missing(v) for v in [tag_cell, qty_cell, value_cell, cat_act_cell, cat_cell, desc_cell]):
             continue
 
         tags = _split_tags(tag_cell)
@@ -256,7 +253,8 @@ def read_excel_bom_table(excel_file: Path) -> list[dict[str, Any]]:
                 "tag_raw": tag_cell,
                 "quantity": qty,
                 "value": _as_str(value_cell),
-                "category": _as_str(cat_cell),
+                # Prefer the ACT-specific category column when available
+                "category": _as_str(cat_act_cell or cat_cell),
                 "description": _as_str(desc_cell),
                 # Extended fields
                 "weight_kg": _to_float(_cell(r, "weight_kg")),
@@ -274,6 +272,7 @@ def read_excel_bom_table(excel_file: Path) -> list[dict[str, Any]]:
                 "process": _as_str(_cell(r, "process")),
                 "memory_emission_factor": _to_float(_cell(r, "memory_emission_factor")),
                 "type": _as_str(_cell(r, "type")),
+                "packaging": _as_str(_cell(r, "packaging")),
             }
         )
 
@@ -531,47 +530,70 @@ def build_generic_bom(entries: list[dict[str, Any]], *, stem: str, excel_name: s
         # ── Classify component ───────────────────────────────────────────────────
         desc_lower = desc.lower()
         cat_desc = cat + " " + desc_lower  # combined for keyword matching
+        cat_stripped = cat.strip()          # bare ACT category value (e.g. "ic", "dram")
+
+        # When the ACT category column provides an explicit value, trust it entirely and
+        # skip keyword heuristics. This prevents false positives like "ceramic" matching
+        # "ram", or "NOR Flash" matching "flash" when ACT explicitly says "IC".
+        _has_cat = bool(cat_stripped)
 
         # Material flags are evaluated first so they can exclude IC mis-classification.
-        is_pcb = any(
+        is_pcb = cat_stripped == "pcb" or (not _has_cat and any(
             x in cat_desc
             for x in ("laminate", "pcb", "motherboard", "epoxy glass", "printed circuit")
+        ))
+        is_solder = "solder" in cat   # matches "solder", "pb free solder", etc.
+        is_shield = cat_stripped == "shield" or (not _has_cat and "shield" in cat and not is_solder)
+        is_aluminum = (not is_solder) and (not is_shield) and (
+            cat_stripped == "aluminum"
+            or (not _has_cat and any(x in cat_desc for x in ("alumin", "aluminum", "aluminium")))
         )
-        is_solder = "solder" in cat
-        is_shield = "shield" in cat
-        is_aluminum = (not is_solder) and (not is_shield) and any(
-            x in cat_desc for x in ("alumin", "aluminum", "aluminium")
-        )
+        is_other = cat_stripped == "other"
 
-        is_ram = any(x in cat_desc for x in ("ram", "dram", "lpddr", "sdram", "memory"))
-        is_flash = (not is_ram) and any(
+        # When ACT category is explicitly "ic", treat as silicon IC regardless of keywords.
+        _act_ic = cat_stripped == "ic"
+
+        is_ram = cat_stripped == "dram" or (not _has_cat and any(
+            x in cat_desc for x in ("ram", "dram", "lpddr", "sdram", "memory")
+        ))
+        is_flash = (not is_ram) and (cat_stripped == "flash" or (not _has_cat and any(
             x in cat_desc for x in ("flash", "nand", "emmc", "ssd", "storage")
+        )))
+        is_cpu = (not is_ram) and (not is_flash) and (not is_pcb) and (
+            cat_stripped == "cpu"
+            or (not _has_cat and any(
+                x in cat_desc
+                for x in ("processor", "soc", "cpu", "microprocessor", "application processor")
+            ))
         )
-        is_cpu = (not is_pcb) and any(
-            x in cat_desc
-            for x in ("processor", "soc", "cpu", "microprocessor", "application processor")
-        )
-        is_ic = (not is_ram) and (not is_flash) and (not is_cpu) and (not is_pcb) and any(
-            x in cat_desc
-            for x in (
-                "integrated circuit",
-                "controller",
-                "transceiver",
-                "semiconductor",
-                "amplifier",
-                "ic ",
-                " ic",
-            )
+        is_ic = (not is_ram) and (not is_flash) and (not is_cpu) and (not is_pcb) and (
+            _act_ic or (not _has_cat and any(
+                x in cat_desc
+                for x in (
+                    "integrated circuit",
+                    "controller",
+                    "transceiver",
+                    "semiconductor",
+                    "amplifier",
+                    "ic ",
+                    " ic",
+                )
+            ))
         )
         # Tag-based IC fallback: U* tags without a category are treated as ICs
         if not any([is_ram, is_flash, is_cpu, is_ic, is_pcb]) and tags and tags[0].startswith("U"):
             is_ic = True
 
-        is_connector = any(x in cat for x in ("connector", "header", "port", "socket"))
-        is_capacitor = "capacitor" in cat
-        is_resistor = "resistor" in cat
-        is_inductor = "inductor" in cat
-        is_diode = "diode" in cat or "led" in cat or "tvs" in cat
+        is_connector = cat_stripped == "connector" or (not _has_cat and any(
+            x in cat for x in ("connector", "header", "port", "socket")
+        ))
+        is_peripheral = cat_stripped == "peripheral"
+        is_capacitor = cat_stripped == "capacitor" or (not _has_cat and "capacitor" in cat_desc)
+        is_resistor = cat_stripped == "resistor" or (not _has_cat and "resistor" in cat_desc)
+        is_inductor = cat_stripped == "inductor" or (not _has_cat and "inductor" in cat_desc)
+        is_diode = any(x in cat for x in ("glass_smd", "diode", "led", "tvs")) or (
+            not _has_cat and any(x in cat_desc for x in ("diode", "led", "tvs"))
+        )
 
         # ── Silicon ──────────────────────────────────────────────────────────────
         if is_ram:
@@ -635,7 +657,7 @@ def build_generic_bom(entries: list[dict[str, Any]], *, stem: str, excel_name: s
             if layers is not None:
                 spec["layers"] = int(layers)
             if thickness_mm is not None:
-                spec["thickness"] = f"{thickness_mm} mm"
+                spec["thickness"] = f"{thickness_mm:.6g} mm"
             if not any(k for k in spec if k != "category"):
                 spec["quantity"] = qty
             bom["materials"][key] = spec
@@ -681,6 +703,14 @@ def build_generic_bom(entries: list[dict[str, Any]], *, stem: str, excel_name: s
         # ── Passives ─────────────────────────────────────────────────────────────
         if is_connector:
             key = _passive_key("connector", "con", tags)
+            spec = {"category": "connector", "type": "generic", "quantity": qty}
+            if weight_kg is not None and weight_kg > 0:
+                spec["weight"] = _fmt_weight(weight_kg)
+            bom["passives"][key] = spec
+            continue
+
+        if is_peripheral:
+            key = _passive_key("connector", "con", tags)
             spec = {"category": "connector", "type": "peripheral", "quantity": qty}
             if weight_kg is not None and weight_kg > 0:
                 spec["weight"] = _fmt_weight(weight_kg)
@@ -689,13 +719,13 @@ def build_generic_bom(entries: list[dict[str, Any]], *, stem: str, excel_name: s
 
         if is_capacitor:
             key = _passive_key("capacitor", "cap", tags)
-            pkg = _extract_package_size(package_size_mm, desc)
+            pkg = _extract_package_size(e.get("packaging") or e.get("type") or package_size_mm, desc)
             bom["passives"][key] = {"category": "capacitor", "type": pkg, "quantity": qty}
             continue
 
         if is_resistor:
             key = _passive_key("resistor", "res", tags)
-            pkg = _extract_package_size(package_size_mm, desc)
+            pkg = _extract_package_size(e.get("packaging") or e.get("type") or package_size_mm, desc)
             bom["passives"][key] = {"category": "resistor", "type": pkg, "quantity": qty}
             continue
 
@@ -706,7 +736,7 @@ def build_generic_bom(entries: list[dict[str, Any]], *, stem: str, excel_name: s
                 spec["type"] = "weight_based"
                 spec["weight"] = _fmt_weight(weight_kg)
             else:
-                spec["type"] = _extract_package_size(package_size_mm, desc)
+                spec["type"] = _extract_package_size(e.get("packaging") or package_size_mm, desc)
             bom["passives"][key] = spec
             continue
 
@@ -714,6 +744,21 @@ def build_generic_bom(entries: list[dict[str, Any]], *, stem: str, excel_name: s
             key = _passive_key("diode", "dio", tags)
             dtype = "led" if "led" in cat else "glass_smd"
             spec = {"category": "diode", "type": dtype, "quantity": qty}
+            if weight_kg is not None and weight_kg > 0:
+                spec["weight"] = _fmt_weight(weight_kg)
+            bom["passives"][key] = spec
+            continue
+
+        # ── Other (explicit ACT category "other") ────────────────────────────────
+        if is_other:
+            type_val = (e.get("type") or "").strip()
+            part = part_slug or f"other_{next_id('other')}"
+            key = f"other.{part}"
+            if key in bom["passives"]:
+                key = f"other.{part}_{next_id('other')}"
+            spec = {"category": "other", "quantity": qty}
+            if type_val:
+                spec["type"] = type_val
             if weight_kg is not None and weight_kg > 0:
                 spec["weight"] = _fmt_weight(weight_kg)
             bom["passives"][key] = spec

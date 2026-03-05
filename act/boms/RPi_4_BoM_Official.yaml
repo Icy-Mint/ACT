@@ -7,7 +7,7 @@ silicon:
     fab_yield: 0.875
     capacity: 4 GB
     process: lpddr2_20nm
-  cpu.BCM2711ZPKFSB06C0TT:
+  ics.BCM2711ZPKFSB06C0TT:
     n_ics: 1
     fab_yield: 0.875
     gpa: 95
@@ -70,11 +70,6 @@ silicon:
     fab_ci: coal
     area: 1.23 mm2
     process: 28nm
-  dram.0.22MF:
-    model: dram
-    n_ics: 34
-    fab_yield: 0.875
-    process: ddr3_50nm
   ics.SC0591:
     n_ics: 1
     fab_yield: 0.875
@@ -82,11 +77,13 @@ silicon:
     fab_ci: coal
     area: 10.8 mm2
     process: 28nm
-  ssd.W25X40CLUXIG:
-    model: flash
+  ics.W25X40CLUXIG:
     n_ics: 1
     fab_yield: 0.875
-    process: nand_30nm
+    gpa: 95
+    fab_ci: coal
+    area: 1.8 mm2
+    process: 28nm
   ics.NC7WZ16P6X:
     n_ics: 1
     fab_yield: 0.875
@@ -101,27 +98,6 @@ silicon:
     fab_ci: coal
     area: 0.4 mm2
     process: 28nm
-  cpu.CSP-USC16-R2:
-    n_ics: 1
-    fab_yield: 0.875
-    gpa: 95
-    fab_ci: coal
-    process: 28nm
-  dram.1040310811:
-    model: dram
-    n_ics: 1
-    fab_yield: 0.875
-    process: ddr3_50nm
-  dram.0.25pF:
-    model: dram
-    n_ics: 1
-    fab_yield: 0.875
-    process: ddr3_50nm
-  dram.GRM0335C1E100JA01D:
-    model: dram
-    n_ics: 6
-    fab_yield: 0.875
-    process: ddr3_50nm
   ics.SKY13351-378LF:
     n_ics: 1
     fab_yield: 0.875
@@ -129,118 +105,44 @@ silicon:
     fab_ci: coal
     area: 0.2 mm2
     process: 28nm
-  ics.DMG1012T:
-    n_ics: 6
-    fab_yield: 0.875
-    gpa: 95
-    fab_ci: coal
-    process: 45nm
-  dram.CAP_CER_22pF_0603_25V5%:
-    model: dram
-    n_ics: 4
-    fab_yield: 0.875
-    process: ddr3_50nm
-  dram.0603:
-    model: dram
-    n_ics: 1
-    fab_yield: 0.875
-    process: ddr3_50nm
-  ics.SC0264:
-    n_ics: 2
-    fab_yield: 0.875
-    gpa: 95
-    fab_ci: coal
-    process: 45nm
-  ics.HDMI05-CL02F3:
-    n_ics: 2
-    fab_yield: 0.875
-    gpa: 95
-    fab_ci: coal
-    process: 45nm
-  dram.0.05pF:
-    model: dram
-    n_ics: 1
-    fab_yield: 0.875
-    process: ddr3_50nm
-  ics.1608:
-    n_ics: 1
-    fab_yield: 0.875
-    gpa: 95
-    fab_ci: coal
-    process: 45nm
-  dram.CAP_CERAMIC_0.1MF_X5R_0603:
-    model: dram
-    n_ics: 75
-    fab_yield: 0.875
-    process: ddr3_50nm
-  dram.1608:
-    model: dram
-    n_ics: 19
-    fab_yield: 0.875
-    process: ddr3_50nm
-  dram.CAP_CERAMIC_47uF_X5R_6.3V_2012:
-    model: dram
-    n_ics: 9
-    fab_yield: 0.875
-    process: ddr3_50nm
-  dram.CAP_CERAMIC_10MF_6.3v_X5R_1608:
-    model: dram
-    n_ics: 9
-    fab_yield: 0.875
-    process: ddr3_50nm
-  dram.GRM155R60J475ME47J:
-    model: dram
-    n_ics: 21
-    fab_yield: 0.875
-    process: ddr3_50nm
-  dram.CAP_CER_0603_27pF_5%_25V:
-    model: dram
-    n_ics: 3
-    fab_yield: 0.875
-    process: ddr3_50nm
-  dram.CAP_CERAMIC_2.2MF_X5R_1005_6.3v_:
-    model: dram
-    n_ics: 7
-    fab_yield: 0.875
-    process: ddr3_50nm
 materials:
-  solder:
-    category: tin
-    type: tin
+  solder.pbfree:
+    category: pb_free_solder
+    type: pb_free_solder
     weight: 0.00169 kg
   pcb:
     category: pcb
     area: 47.6000 cm2
     layers: 6
-    thickness: 0.26666666666666666 mm
-  shield.metal001:
-    category: tin
-    type: tin
+    thickness: 0.266667 mm
+  aluminum:
+    category: aluminum
+    type: aluminum
     weight: 0.0003 kg
 passives:
   connector.con_001:
     category: connector
-    type: peripheral
+    type: generic
     quantity: 1
     weight: 0.0022 kg
   connector.con_002:
     category: connector
-    type: peripheral
+    type: generic
     quantity: 2
     weight: 0.0005 kg
   connector.con_003:
     category: connector
-    type: peripheral
+    type: generic
     quantity: 1
     weight: 0.0061 kg
   connector.con_004:
     category: connector
-    type: peripheral
+    type: generic
     quantity: 1
     weight: 0.0055 kg
   connector.con_005:
     category: connector
-    type: peripheral
+    type: generic
     quantity: 1
     weight: 0.0049 kg
   diode.dio_001:
@@ -255,12 +157,12 @@ passives:
     weight: 0.000119 kg
   connector.con_006:
     category: connector
-    type: peripheral
+    type: generic
     quantity: 1
     weight: 0.003 kg
   connector.con_007:
     category: connector
-    type: peripheral
+    type: generic
     quantity: 1
     weight: 0.00022 kg
   diode.dio_003:
@@ -273,12 +175,16 @@ passives:
     type: glass_smd
     quantity: 1
     weight: 9.3e-05 kg
+  capacitor.cap_001:
+    category: capacitor
+    type: '0603'
+    quantity: 34
   diode.dio_005:
     category: diode
     type: led
     quantity: 1
     weight: 6.8e-05 kg
-  capacitor.cap_001:
+  capacitor.cap_002:
     category: capacitor
     type: '0603'
     quantity: 1
@@ -289,12 +195,14 @@ passives:
     weight: 3e-05 kg
   connector.con_008:
     category: connector
-    type: peripheral
+    type: generic
     quantity: 2
     weight: 0.0004 kg
-  other.other_001.X25M000000S305:
+  other.X25M000000S305:
     category: other
     quantity: 2
+    type: passive_generic
+    weight: 5e-05 kg
   diode.dio_007:
     category: diode
     type: glass_smd
@@ -305,31 +213,112 @@ passives:
     quantity: 4
     type: weight_based
     weight: 2.9e-05 kg
-  other.other_002.X54M000000S303:
+  connector.con_009:
+    category: connector
+    type: generic
+    quantity: 1
+    weight: 0.0005 kg
+  connector.con_010:
+    category: connector
+    type: generic
+    quantity: 1
+    weight: 0.00047 kg
+  capacitor.cap_003:
+    category: capacitor
+    type: '0603'
+    quantity: 7
+  capacitor.cap_004:
+    category: capacitor
+    type: '0603'
+    quantity: 6
+  other.X54M000000S303:
     category: other
     quantity: 1
-  other.other_003.X37M400000S002:
+    type: passive_generic
+    weight: 5e-05 kg
+  other.X37M400000S002:
     category: other
     quantity: 1
+    type: passive_generic
+    weight: 5e-05 kg
+  diode.dio_008:
+    category: diode
+    type: glass_smd
+    quantity: 6
+    weight: 2e-06 kg
+  capacitor.cap_005:
+    category: capacitor
+    type: '0603'
+    quantity: 4
+  capacitor.cap_006:
+    category: capacitor
+    type: '0603'
+    quantity: 4
   resistor.res_001:
     category: resistor
     type: '0603'
     quantity: 4
-  other.other_004.DPX165950DT-8048A1:
+  other.SC0264:
+    category: other
+    quantity: 2
+    type: inductor_multilayer
+    weight: 1.8e-05 kg
+  other.other_001.DPX165950DT-8048A1:
     category: other
     quantity: 1
+  diode.dio_009:
+    category: diode
+    type: glass_smd
+    quantity: 2
+    weight: 2e-06 kg
   inductor.ind_002:
     category: inductor
     quantity: 2
     type: weight_based
     weight: 3.5e-05 kg
+  capacitor.cap_007:
+    category: capacitor
+    type: '0603'
+    quantity: 1
+  capacitor.cap_008:
+    category: capacitor
+    type: '0603'
+    quantity: 1
+  capacitor.cap_009:
+    category: capacitor
+    type: '0603'
+    quantity: 1
+  capacitor.cap_010:
+    category: capacitor
+    type: '0603'
+    quantity: 1
+  capacitor.cap_011:
+    category: capacitor
+    type: '0603'
+    quantity: 1
+  capacitor.cap_012:
+    category: capacitor
+    type: '0603'
+    quantity: 1
+  capacitor.cap_013:
+    category: capacitor
+    type: '0603'
+    quantity: 1
+  capacitor.cap_014:
+    category: capacitor
+    type: '0603'
+    quantity: 1
+  capacitor.cap_015:
+    category: capacitor
+    type: '0603'
+    quantity: 1
   resistor.res_002:
     category: resistor
     type: '0603'
     quantity: 1
   resistor.res_003:
     category: resistor
-    type: '1005'
+    type: '0402'
     quantity: 15
   resistor.res_004:
     category: resistor
@@ -347,7 +336,7 @@ passives:
     category: inductor
     quantity: 1
     type: weight_based
-    weight: 1.7e-07 kg
+    weight: 4e-06 kg
   inductor.ind_004:
     category: inductor
     quantity: 1
@@ -359,6 +348,11 @@ passives:
     type: weight_based
     weight: 1.7e-07 kg
   inductor.ind_006:
+    category: inductor
+    quantity: 1
+    type: weight_based
+    weight: 1.7e-07 kg
+  inductor.ind_007:
     category: inductor
     quantity: 1
     type: weight_based
@@ -377,34 +371,34 @@ passives:
     quantity: 3
   resistor.res_010:
     category: resistor
-    type: '1005'
+    type: '0402'
     quantity: 7
   resistor.res_011:
     category: resistor
-    type: '1005'
+    type: '0402'
     quantity: 7
-  inductor.ind_007:
-    category: inductor
+  other.BLM15AG221SN1D:
+    category: other
     quantity: 6
-    type: weight_based
+    type: inductor_multilayer
     weight: 1e-06 kg
   resistor.res_012:
     category: resistor
     type: '0603'
     quantity: 2
-  connector.con_009:
+  connector.con_011:
     category: connector
-    type: peripheral
+    type: generic
     quantity: 2
     weight: 1.7e-07 kg
-  inductor.ind_008:
-    category: inductor
+  other.SMD:
+    category: other
     quantity: 4
-    type: weight_based
+    type: inductor_multilayer
     weight: 1e-06 kg
   resistor.res_013:
     category: resistor
-    type: '1005'
+    type: '0402'
     quantity: 3
   resistor.res_014:
     category: resistor
@@ -412,29 +406,57 @@ passives:
     quantity: 1
   resistor.res_015:
     category: resistor
-    type: '1005'
+    type: '0402'
     quantity: 2
   resistor.res_016:
     category: resistor
-    type: '1005'
+    type: '0402'
     quantity: 2
   resistor.res_017:
     category: resistor
-    type: '1005'
+    type: '0402'
     quantity: 2
   resistor.res_018:
     category: resistor
-    type: '1005'
+    type: '0402'
     quantity: 2
   resistor.res_019:
     category: resistor
-    type: '1005'
+    type: '0402'
     quantity: 1
   resistor.res_020:
     category: resistor
-    type: '1005'
+    type: '0402'
     quantity: 1
   resistor.res_021:
     category: resistor
-    type: '1005'
+    type: '0402'
     quantity: 1
+  capacitor.cap_016:
+    category: capacitor
+    type: '0603'
+    quantity: 75
+  capacitor.cap_017:
+    category: capacitor
+    type: '0603'
+    quantity: 19
+  capacitor.cap_018:
+    category: capacitor
+    type: 0805
+    quantity: 9
+  capacitor.cap_019:
+    category: capacitor
+    type: '0603'
+    quantity: 9
+  capacitor.cap_020:
+    category: capacitor
+    type: '0402'
+    quantity: 21
+  capacitor.cap_021:
+    category: capacitor
+    type: '0603'
+    quantity: 3
+  capacitor.cap_022:
+    category: capacitor
+    type: '0402'
+    quantity: 7

@@ -13,8 +13,9 @@ DEFAULT_CONNECTOR_MODEL_FILE = f"{ACT_ROOT}/models/passives/connector.yaml"
 
 class ConnectorType(Enum):
     """Enumeration of connector types based on Ecoinvent 3.11 data"""
-    PCI = "pci"  # Peripheral Component Interconnect bus
-    PERIPHERAL = "peripheral"  # Peripheral type bus (default for most connectors)
+    GENERIC = "generic"      # Generic / general connector (default)
+    PCI = "pci"              # Peripheral Component Interconnect bus
+    PERIPHERAL = "peripheral"  # Peripheral type bus
 
 
 class ConnectorModel:
@@ -47,18 +48,15 @@ class ConnectorModel:
             except ValueError:
                 log.warn(f"Unknown connector type '{connector_type}' in model file, skipping.")
         
-        # Ensure we have the required factors
-        if ConnectorType.PERIPHERAL not in self.emission_factors:
-            log.error("Peripheral connector emission factor missing from model.")
-            exit(-1)
-        if ConnectorType.PCI not in self.emission_factors:
-            log.error("PCI connector emission factor missing from model.")
+        # Ensure we have at least a generic factor
+        if ConnectorType.GENERIC not in self.emission_factors:
+            log.error("Generic connector emission factor missing from model.")
             exit(-1)
     
     def get_carbon(
         self,
         weight: units,
-        connector_type: ConnectorType = ConnectorType.PERIPHERAL,
+        connector_type: ConnectorType = ConnectorType.GENERIC,
         n_connectors: int = 1
     ) -> Carbon:
         """
@@ -80,9 +78,9 @@ class ConnectorModel:
         # Get the emission factor for this connector type
         if connector_type not in self.emission_factors:
             log.warn(
-                f"Connector type {connector_type} not found in model. Using peripheral type emission factor."
+                f"Connector type {connector_type} not found in model. Using generic emission factor."
             )
-            emission_factor = self.emission_factors[ConnectorType.PERIPHERAL]
+            emission_factor = self.emission_factors[ConnectorType.GENERIC]
         else:
             emission_factor = self.emission_factors[connector_type]
         
