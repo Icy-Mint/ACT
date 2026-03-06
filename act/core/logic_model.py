@@ -178,9 +178,7 @@ class LogicModel:
         cpa = self.get_cpa(
             logic_process=logic_process, fab_yield=fab_yield, gpa=gpa, fab_ci=fab_ci
         )
-        carbon = Carbon(area * cpa, SourceType.FABRICATION) + Carbon(
-            n_ics * CARBON_PER_IC_PACKAGE, SourceType.PACKAGING
-        )
+        carbon = Carbon(area * cpa, SourceType.FABRICATION)
         return carbon
 
     def get_carbon_energy(
