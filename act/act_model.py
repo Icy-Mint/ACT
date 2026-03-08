@@ -318,7 +318,7 @@ class ACTModel:
                     else type(spec.type)(spec.category.value)
                 )
                 carbon = self.materials_model.get_carbon(
-                    mat=mat, weight=spec.weight
+                    mat=mat, weight=spec.weight, quantity=spec.quantity
                 )
             elif spec.category is ComponentCategory.PCB:
                 carbon = self.pcb_model.get_carbon(

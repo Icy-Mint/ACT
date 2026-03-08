@@ -49,7 +49,7 @@ class MaterialsModel:
                 g / g
             ), f"Materials cost must be dimensionless. Got {v} for material {k}."
 
-    def get_carbon(self, mat, weight: units) -> Carbon:
+    def get_carbon(self, mat, weight: units, quantity: int = 1) -> Carbon:
         """
         Get the estimated carbon emissions from a given material and weight.
 
@@ -65,5 +65,5 @@ class MaterialsModel:
         """
         assert weight.check(g), f"Weight should be in units of weight but got {weight}"
         c_per_kg = self.model[self.MaterialType(mat)]
-        c = c_per_kg * weight
+        c = c_per_kg * weight * quantity
         return Carbon(c, SourceType.ENCLOSURE)
