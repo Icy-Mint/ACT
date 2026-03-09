@@ -1,7 +1,8 @@
 # GHG from fab as per Table 1 in ACT paper
-"130nm": 91 g / cm2     # prediction based on linear regression
-"65nm" : 95 g / cm2     # prediction based on linear regression
-"45nm" : 100 g / cm2    # prediction based on linear regression
+"130nm": 42 g / cm2    # 73.6 * 0.57
+"90nm":  42 g / cm2    # 73.6 * 0.57
+"65nm":  42 g / cm2    # 72.9 * 0.57
+"45nm":  51 g / cm2    # 89.2 * 0.57
 "28nm" : 100 g / cm2
 "20nm" : 110 g / cm2
 "14nm" : 125 g / cm2
