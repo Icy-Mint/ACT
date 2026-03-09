@@ -12,8 +12,8 @@ silicon:
     gpa: 95
     fab_ci: world
 
-  soc.ESP32_WROOM32:
-    area: 0.182 cm2
+  soc.ESP32_S3:
+    area: 0.24598 cm2
     process: 45nm  
     n_ics: 1
     fab_yield: 0.875

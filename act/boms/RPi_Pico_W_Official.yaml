@@ -11,7 +11,7 @@ silicon:
     n_ics: 1
     fab_yield: 0.875
     gpa: 95
-    fab_ci: coal
+    fab_ci: taiwan
 
   U2.RT6154AGQW:
     area: 2.53 mm2
@@ -19,7 +19,7 @@ silicon:
     n_ics: 1
     fab_yield: 0.875
     gpa: 95
-    fab_ci: coal
+    fab_ci: world
 
   U3.W25Q16JVUXIQ: # Serial NOR Flash, QSPI, 16MBit, 8-pin USON 2x3mm 133MHz
     model: flash
@@ -33,7 +33,7 @@ silicon:
     n_ics: 1
     fab_yield: 0.875
     gpa: 95
-    fab_ci: coal
+    fab_ci: world
 
 materials:
 # 1 x PCB
