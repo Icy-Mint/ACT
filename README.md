@@ -1,210 +1,75 @@
-# ACT: Architectural Carbon Modeling Tool
+# Embodied Carbon Modeling for MicroGreen
 
-Version: 2.0 <br>
-README Last Updated: 2/17/2025
+This is the open-source repository for the embodied carbon modeling section of the MicroGreen paper. 
 
-ACT is an carbon modeling tool to enable carbon-aware design space exploration.
-ACT comprises an analytical, architectural carbon-footprint model and use-case dependent optimization metrics to estimate the carbon footprint of hardware.
-The proposed model estimates emissions from hardware manufacturing (i.e., embodied carbon) based on workload characteristics, hardware specifications, semiconductor fab characteristics, and environmental factors.
+The model uses the ACT carbon modeling tool as a foundation for silicon-level modeling, and incorporates additional modeling methodologies for other components described in the paper, including capacitors, resistors, inductors, PCBs, and connectors.
 
-ACT addresses a crucial gap in quantifying and enabling sustainability-driven hardware design space exploration, and serves as a call-to-action for computer architects to consider sustainability as a first-order citizen, alongside performance, power, and area (PPA).
-If you use ACT for your research, please consider contributing the resulting system specification for your carbon model analysis to the bill of materials directory (`ACT/act/boms`).
+### Generate Embodied Carbon Modeling Results for MicroGreen
 
-## Quick Start
+Ensure you are running commands within MicroGreen's virtual environment to satisfy all library requirements.
+```bash
+mkdir ouputs
+python -m act.act_model -m act/boms/ESP32.yaml --export-file ouputs/ESP32_output
+python -m act.act_model -m act/boms/ESP32-C6.yaml --export-file ouputs/ESP32-C6_output
+python -m act.act_model -m act/boms/ESP32-S3.yaml --export-file ouputs/ESP32-S3_output
+python -m act.act_model -m act/boms/RPi_Pico_W_Official.yaml --export-file ouputs/RPi_Pico_W_Official_output
+python -m act.act_model -m act/boms/RPi_Pico2_W_Official.yaml --export-file ouputs/RPi_Pico2_W_Official_output
+python -m act.act_model -m act/boms/STM32_blackpill.yaml --export-file ouputs/STM32_blackpill_output
+python -m act.act_model -m act/boms/coralDevMicro.yaml --export-file ouputs/coralDevMicro_output
+python -m act.act_model -m act/boms/nRF52840_Minimal.yaml --export-file ouputs/nRF52840_Minimal_output
+```
 
-To get started, first clone [ACT](https://github.com/facebookresearch/ACT) and make sure you have the following third-party Python dependencies:
-* [pint](https://pint.readthedocs.io/en/stable/) - `pip install pint`
-* [pyyaml](https://pypi.org/project/PyYAML/) - `pip install pyyaml`
-* [openpyxl](https://pypi.org/project/openpyxl/) - `pip install openpyxl` (needed for Excel BOM import scripts)
-* Make sure you have Python 3.12.9
-ACT can be used either as a standalone binary or an API where you can program your codebase and use cases against.
-The code is built on `Python 3.12.9`.
+For the full list of command-line arguments, run `python -m act.act_model --help`.
 
-### Command Line
-
-To use ACT as a standalone binary tool:
-
-1. Go to the ACT root directory
-2. From the command line, run `act_model.py -m boms/dellr740.yaml` which should run an existing specification for the Dell power edge server
-3. This should export the results to a report yaml file where you can inspect the results
-
-For the full list of command line arguments, use `python -m act.act_model --help`.
-
-### Python API
-
-To program against ACT in your own script:
-1. Go to the ACT root directory
-2. In your python script, import ACTModel which is the top level Python class from act_model.py
-3. Instantiate ACTModel which will instantiate and load all of the submodels
-4. Generate a bill of materials instance BOM from bom.py which specifies the resources for the device you want to study
-5. Call the ACTModel `get_carbon()` function with the bill of materials instance as well as other parameters (see the `get_carbon()` function)
-6. This should return a dictionary of the carbon results by each component in the system
+---
 
 ## Bill of Materials Specification
 
-For complex systems, we recommend using the ACT bill of materials yaml specification to specify your system architecture.
-The bill of materials specification is composed of three main sections:
-1. `silicon`: Any silicon systems like logic, DRAM, SSD, HDD, etc.
-2. `materials`: Materials required for the frame and enclosure of the system
-3. `passives`: Passive components (ex., capacitors, etc.)
+To use our model to evaluate the BoM of other MCUs and electronic devices, you can either write your own bill of materials or start from one of the existing examples in the `boms` directory.
 
-### New: Generate BOM YAML from Excel
-
-ACT now includes helper scripts to **generate** a BOM YAML from a simple Excel BOM table and **validate** the resulting YAML.
-
-What's new:
-- `scripts/generate_bom_from_excel.py`: Reads a `.xlsx` BOM table and writes `act/boms/<stem>.yaml`.
-  - For `RPi_Pico_W_Official.xlsx`, the generator reproduces the curated reference model (including the value-in-name keys like `U2.RT6154AGQW`, `capacitor.C12.2.2u`, etc.).
-- `scripts/validate_bom.py`: Validates BOM structure and can optionally validate coverage against an Excel file.
-
-Excel input format (minimum):
-- **Quantity** and **Value** columns
-- Optional: **Tag**, **Component Category**, **Component Description**
-
-Additional dependency for Excel import:
-- [openpyxl](https://pypi.org/project/openpyxl/) - `pip install openpyxl`
-
-#### Example workflow (Excel → YAML → validate → carbon analysis)
-
+Once your bill of materials is ready, run it with ACT using:
 ```bash
-# Step 1: Generate YAML from Excel
-python scripts/generate_bom_from_excel.py data/raw/RPi_Pico_W_Official.xlsx
-# Output: act/boms/RPi_Pico_W_Official.yaml
-
-# Step 2: Validate the YAML
-python scripts/validate_bom.py act/boms/RPi_Pico_W_Official.yaml
-# OK: Valid BOM
-
-# (Optional) Validate the YAML matches the Excel contents (tagged sheets like Pico)
-python scripts/validate_bom.py act/boms/RPi_Pico_W_Official.yaml --excel data/raw/RPi_Pico_W_Official.xlsx
-
-# Step 3: Run carbon analysis
-python -m act.act_model --materials act/boms/RPi_Pico_W_Official.yaml
-# Output: Carbon report
+python -m act.act_model -m <your_bom.yaml>
 ```
 
-A sample bill of materials file is shown below:
-```
-name: Test bill of material
-passives:
-  cap0:
-    category: capacitor
-    type: mlcc
-    quantity: 2
-    weight: 0.03 mg
-silicon:
-  dut:
-    area: 10 mm2
-    fab_yield: 0.87
-    process: 14nm
-    n_ics: 1
-    fab_ci: taiwan
-  dram:
-    model: dram
-    capacity: 1 GB
-    fab_yield: 0.9
-    process: ddr4_10nm
-  ssd:
-    model: flash
-    capacity: 2 TB
-    fab_yield: 0.88
-    process: nand_10nm
-  hdd:
-    model: hdd
-    capacity: 1 TB
-    fab_yield: 0.92
-    process: BarraCuda
-materials:
-  fasteners:
-    category: enclosure
-    type: steel
-    weight: 0.6 g
-  pcb:
-    category: pcb
-    area: 10 cm2
-    layers: 4
-  battery:
-    category: battery
-    capacity: 5000 mWh
-```
+For example, `python -m act.act_model -m act/boms/dellr740.yaml` runs one of the stock Dell R740 models.
 
-You can either write your own similar bill of materials or start from one of the existing bill of materials in the `boms` directory.
-Once you have your bill of materials specification, you can run it with ACT using `python -m act.act_model -m <your bom yaml>`.
-For instance, `python -m act.act_model -m act/boms/dellr740.yaml` will run one of the stock Dell R740 models.
+---
 
 ## Codebase Structure
 
-The top level binary is ACTModel.py which orchestrates the calculations across the underlying embodied architectural carbon model for logic, memory, storage, etc.
+The top-level entry point is `act_model.py`, which orchestrates calculations across the underlying embodied architectural carbon models for logic, memory, storage, peripheral components, and more.
 
 ACT currently supports the following models:
-* `logic_model.py`: Application processor and digital logic embodied carbon model
-* `dram_model.py`: DRAM embodied carbon capacity-based models
-* `ssd_model.py`: SSD embodied carbon capacity-based models
-* `hdd_model.py`: HDD embodied carbon capacity-based models
-* `op_model.py`: Operational emissions model
-* `cap_model.py`: Capacitor manufacturing embodied carbon model
-* `materials_model.py`: Frame and enclosure materials embodied carbon model
-* `pcb_model.py`: Printed circuit board area-based embodied carbon model
-* `battery_model.py`: Battery capacity-based embodied carbon model
 
-Data for the architectural carbon model draw from sustainability literature and industry sources (additional information can be found in [our paper](https://dl.acm.org/doi/10.1145/3470496.3527408), see details below).
+- `logic_model.py`: Application processor and digital logic embodied carbon model
+- `dram_model.py`: DRAM embodied carbon capacity-based model
+- `ssd_model.py`: SSD embodied carbon capacity-based model
+- `hdd_model.py`: HDD embodied carbon capacity-based model
+- `storage_model.py`: Storage embodied carbon model
+- `op_model.py`: Operational emissions model
+- `capacitor_model.py`: Capacitor embodied carbon model
+- `resistor_model.py`: Resistor embodied carbon model
+- `inductor_model.py`: Inductor embodied carbon model
+- `connector_model.py`: Connector embodied carbon model
+- `diode_model.py`: Diode embodied carbon model
+- `switch_model.py`: Switch embodied carbon model
+- `other_model.py`: Other miscellaneous component embodied carbon model (e.g. passive filters)
+- `materials_model.py`: Frame and enclosure materials embodied carbon model
+- `pcb_model.py`: Printed circuit board area-based embodied carbon model
+- `battery_model.py`: Battery capacity-based embodied carbon model
+- `active_model.py`: Active component embodied carbon model
 
-## Carbon Footprint Modeling Details
+Data for the architectural carbon model is drawn from sustainability literature and industry sources. Additional information can be found in the MicroGreen paper.
 
-Central to ACT is an analytical, architectural carbon model to estimate operational and embodied carbon.
-We describe the model below and details can be found in our [paper](https://dl.acm.org/doi/10.1145/3470496.3527408).
+---
 
-At the highest level the analytical carbon model combines operational and embodied carbon. As embodied carbon is generated at design and manufacturing time, we amortize emissions across the duration of a software application (T) over the lifetime of a hardware platform (LT).
-
-$$CF = OP_{CF} + \frac{T}{LT} \times E_{CF}$$
-
-The operational carbon owes to the product of the carbon intensity of energy consumed and the energy expenditure of running an application on hardware device.
-
-$$OP_{CF} = CI_{use} \times Energy$$
-
-The embodied carbon owes to both packaging overhead and the embodied carbon of individual hardware components. For packaging overheads we multiply the number of integrated circuits (Nr) with a packaging footprint (Kr). The embodied carbon of all integrated circuits (e.g., application processors and SoC's, DRAM memory, SSD storage, HDD storage) are aggregated.
-
-$$E_{CF} = N_r K_r + \sum_{r}^{SoC, DRAM, SSD, HDD} E_r$$
-
-The embodied footprint of application processors and SoC's depends on the die area, carbon intensity of the energy consumed by the fab and energy consumed per unit area manufactured, the GHG footprint of gasses and chemicals per unit area manufactured, the footprint of procuruing raw materials per unit area, and fabrication yield.
-
-$$E_{SoC} = Area \times CPA$$
-
-$$E_{SoC} = Area \times \frac{CI_{fab} \times EPA + GPA + MPA}{Y}$$
-
-Finally, the embodied carbon of the memory and storage devices depends on the carbon per storage intensity and the storage capacity of the modules.
-
-$$E_{DRAM} = CPS_{DRAM} \times Capacity_{DRAM}$$
-
-$$E_{HDD} = CPS_{HDD} \times Capacity_{HDD}$$
-
-$$E_{SSD} = CPS_{SSD} \times Capacity_{SSD}$$
-
-Refer to the [original paper](https://dl.acm.org/doi/abs/10.1145/3470496.3527408) for the details.
-
-## Carbon Optimization Metrics
-
-In addition to the architectural carbon model, it is crucial to have use-case dependent carbon optimization metrics to quantitatively explore sustainable system design spaces. ACT proposes four sustainability-driven optimization metrics to aid early design space exploration. Here _C_ stands for embodied carbon, _D_ for delay, and _E_ for energy.
-
-| Metric        | Description   | Use case |
-| :-------------: |:-------------:| :-----:|
-| $$CDP$$      | Carbon-delay-product | Balance carbon and performance (e.g., sustainable data center) |
-| $$CEP$$      | Carbon-energy-product | Balance carbon and energy (e.g., sustainable mobile device) |
-| $$C^2EP$$      | Carbon square-energy-product | Sustainable device dominated by embodied carbon |
-| $$CE^2P$$      | Carbon-energy squared-product | Sustainable device dominated by operational carbon |
-
-
-## Example Carbon Analyses
-
-As examples we have provided two comparisons with ACT against life cycle analyses (LCA's). The first with Fairphone 3 and the second with the Dell R740 LCA's.
-You can find some of the sample bill of materials for these analyses in the `act/boms` directory.
-
-# Link to the Paper
+## Link to the ACT
 To read the paper please visit this [link](https://dl.acm.org/doi/abs/10.1145/3470496.3527408)
 
 
-# Citation
-If you use `ACT`, please cite us:
+### Citation
+If you use `ACT`, please cite us:                                                                 
 
 ```
 @inproceedings{GuptaACT2022,
@@ -228,5 +93,5 @@ series = {ISCA '22}
 
 ```
 
-# License
+### License
 ACT is MIT licensed, as found in the LICENSE file.

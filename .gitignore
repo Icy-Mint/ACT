@@ -24,6 +24,4 @@ Thumbs.db
 *.log
 *.tmp
 
-# Raw data (optional - don't commit large Excel files)
-data/raw/*.xlsx
-data/raw/*.xls
+outputs/
