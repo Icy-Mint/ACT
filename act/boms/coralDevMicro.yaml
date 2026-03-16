@@ -6,7 +6,7 @@ silicon:
   # U5 - MIMXRT1176CVM8A ARM Cortex-M4/M7 processor, BGA-289, 14x14mm, 28nm
   # NXP uses TSMC for some products but foundry unconfirmed for this chip; die area estimated
   U5.MIMXRT1176CVM8A:
-    area: 35.0 mm2      # estimated: dual-core crossover MCU at 28nm, ~2-3x RT1060 (~12mm2)
+    area: 22.09 mm2      # estimated: dual-core crossover MCU at 28nm, ~2-3x RT1060 (~12mm2)
     process: 28nm
     n_ics: 1
     fab_yield: 0.875
@@ -16,7 +16,7 @@ silicon:
   # U23 - TPU module (Edge TPU), 15x10mm, 16nm
   # Process node and foundry unconfirmed; die area estimated for a 2W inference accelerator
   U23.TPU:
-    area: 30.0 mm2      
+    area: 25.6 mm2      
     process: 14nm   # proximate for 16nm
     n_ics: 1
     fab_yield: 0.875

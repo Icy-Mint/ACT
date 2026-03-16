@@ -13,7 +13,7 @@ silicon:
     fab_ci: world
 
   soc.ESP32_C6:
-    area: 0.1255 cm2
+    area: 6.75 mm2 # source: https://hackaday.com/2026/02/19/poking-at-the-esp32-p4-and-c6-dies-in-an-esp32-p4-m3-module/ packaging based area estimation 0.1255 cm2
     process: 45nm  
     n_ics: 1
     fab_yield: 0.875

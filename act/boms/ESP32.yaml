@@ -13,7 +13,7 @@ silicon:
     fab_ci: world
 
   soc.ESP32_WROOM32:
-    area: 0.182 cm2
+    area: 8.436 mm2   #  source: https://www.cnx-software.com/2017/02/06/oh-look-espressif-esp32-die-shot-thats-pretty/ area estimation based on packaging 0.182 cm2 
     process: 45nm  
     n_ics: 1
     fab_yield: 0.875

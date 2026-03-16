@@ -13,7 +13,7 @@ silicon:
     fab_ci: world
 
   soc.ESP32_S3:
-    area: 0.24598 cm2
+    area: 13.23 mm2 # estimation based on packaging scaling from ESP-C6 to ESP32-S3, packaging based area estimation 0.24598 cm2
     process: 45nm  
     n_ics: 1
     fab_yield: 0.875

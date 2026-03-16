@@ -5,7 +5,7 @@ description: Materials model for nRF52840 Minimal device,
 silicon:
   # nRF52840 SoC (Nordic Semiconductor, 180nm process)
   U1.nRF52840:
-    area: 24.598 mm2
+    area: 12.6 mm2 # WLCSP https://www.nordicsemi.com/Products/nRF52840#:~:text=aQFN73%207x7mm.%20QFN486x6mm.%20WLCSP3.5x3.6mm. 24.598 mm2
     process: 180nm
     n_ics: 1
     fab_yield: 0.875
@@ -47,7 +47,7 @@ passives:
     type: "0402"
     quantity: 1
 
-  capacitor.C10.NC: # C10, C13, C22 - Not Connected / not fitted
+  capacitor.C10.NC: # C10, C13, C22 
     category: capacitor
     type: "0402"
     quantity: 3
