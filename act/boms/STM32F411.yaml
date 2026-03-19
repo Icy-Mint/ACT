@@ -5,7 +5,7 @@ description: Materials model for STM32F411 Blackpill,
 silicon:
   # U1 - STM32F411CEU6 Microcontroller, UFQFPN-48, 7x7mm, 90nm
   U1.STM32F411CEU6:
-    area: 9.551815 mm2 # source: file:///Users/kristenxchen/Downloads/stm32f411ce.pdf 16.33 mm2  
+    area: 9.551815 mm2 # source: stm32f411ce datasheets 
     process: 90nm
     n_ics: 1
     fab_yield: 0.875
