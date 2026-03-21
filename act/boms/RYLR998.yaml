@@ -1,0 +1,71 @@
+name: RYLR998 LoRa Module Materials Model
+description: Materials model for RYLR998 LoRa transceiver module application circuit,
+  based on application schematic and BoM provided. Includes the RYLR498/RYLR998 module,
+  passive decoupling network, ferrite beads, and helical spring antenna.
+
+silicon:
+  # The RYLR998 module is treated as a single integrated component (contains internal SoC)
+  M1.RYLR998:
+    area: 2 mm2          
+    process: 180nm        
+    n_ics: 1
+    fab_yield: 0.875
+    gpa: 95
+    fab_ci: world
+
+materials:
+  # 1 x PCB (application board)
+  pcb:
+    category: pcb
+    area: 204.4 mm2       
+    layers: 2
+    thickness: 1.6 mm      
+
+  # 1 x Helical Spring Antenna
+  ANT1.ANT-418-HESM:
+    category: bronze
+    type: bronze
+    weight: 0.003880936318 kg   
+    quantity: 1
+
+passives:
+  # Decoupling / bypass capacitors on +3.3V power rail
+  capacitor.C1.10uF:        # C1 — bulk decoupling
+    category: capacitor
+    type: "0603"
+    quantity: 1
+
+  capacitor.C2.10uF:        # C2 — bulk decoupling near module VCC
+    category: capacitor
+    type: "0603"
+    quantity: 1
+
+  capacitor.C3.100nF:       # C3 — high-frequency bypass
+    category: capacitor
+    type: "0603"
+    quantity: 1
+
+  capacitor.C4.47pF:        # C4 — RF / high-frequency decoupling
+    category: capacitor
+    type: "0603"
+    quantity: 1
+
+  # Ferrite beads on power supply lines (EMI filtering)
+  other.B1.BLM15EG121SN1D:  # Murata ferrite bead on +3.3V supply line
+    category: other
+    type: passive_generic
+    weight: 0.00001199184828 kg 
+    quantity: 1
+
+  other.B2.BLM15EG121SN1D:  # Murata ferrite bead on ground / return path
+    category: other
+    type: passive_generic
+    weight: 0.00001199184828 kg 
+    quantity: 1
+
+  # 1 x Pin Header Strip (5-pin, for module interface)
+  J1.TSW-105-07-G-S:
+    category: connector
+    type: peripheral
+    weight: 0.00008910255118 kg  
+    quantity: 1
