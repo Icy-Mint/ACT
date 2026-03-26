@@ -8,15 +8,16 @@ The model uses the ACT carbon modeling tool as a foundation for silicon-level mo
 
 Ensure you are running commands within MicroGreen's virtual environment to satisfy all library requirements.
 ```bash
-mkdir ouputs
-python3 -m act.act_model -m act/boms/ESP32.yaml --export-file ouputs/ESP32_output
-python3 -m act.act_model -m act/boms/ESP32-C6.yaml --export-file ouputs/ESP32-C6_output
-python3 -m act.act_model -m act/boms/ESP32-S3.yaml --export-file ouputs/ESP32-S3_output
-python3 -m act.act_model -m act/boms/RP2040.yaml --export-file ouputs/RP2040_output
-python3 -m act.act_model -m act/boms/RP2350.yaml --export-file ouputs/RP2350_output
-python3 -m act.act_model -m act/boms/STM32F411.yaml --export-file ouputs/STM32F411_output
-python3 -m act.act_model -m act/boms/coralDevMicro.yaml --export-file ouputs/coralDevMicro_output
-python3 -m act.act_model -m act/boms/nRF52840.yaml --export-file ouputs/nRF52840_output
+cd "${EMBODIED_CARBON_MODELING_DIR}"
+mkdir -p outputs
+python3 -m act.act_model -m act/boms/ESP32.yaml --export-file outputs/ESP32_output
+python3 -m act.act_model -m act/boms/ESP32-C6.yaml --export-file outputs/ESP32-C6_output
+python3 -m act.act_model -m act/boms/ESP32-S3.yaml --export-file outputs/ESP32-S3_output
+python3 -m act.act_model -m act/boms/RP2040.yaml --export-file outputs/RP2040_output
+python3 -m act.act_model -m act/boms/RP2350.yaml --export-file outputs/RP2350_output
+python3 -m act.act_model -m act/boms/STM32F411.yaml --export-file outputs/STM32F411_output
+python3 -m act.act_model -m act/boms/coralDevMicro.yaml --export-file outputs/coralDevMicro_output
+python3 -m act.act_model -m act/boms/nRF52840.yaml --export-file outputs/nRF52840_output
 ```
 
 For the full list of command-line arguments, run `python -m act.act_model --help`.
